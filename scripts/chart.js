@@ -32,7 +32,7 @@
             
             //Axis info
             borderCol: "#aaa",                                      // For the axis borders                        
-            yScale: 1,                                              // incremental values on y axis
+            yScale: 10,                                              // incremental values on y axis
             
             
             //Labels
@@ -42,6 +42,7 @@
             
             //Bar chart specifics
             drawBars: [true,false,false],
+            stack:[true,false,false],
             colours: ['#3498db', '#e67e22', '#16a085', '#34495e', '#e74c3c', '#95a5a6', '#1abc9c', '#f1c40f'],                                    
             gap: 10,
             
@@ -66,31 +67,43 @@
         
         var g = graph();
         g.convertTable(this);
-        data = g.values.x[0];
+        //data = g.values.x[0];
         
         var cols = settings.cols;
         if (settings.cols < 0)
         {
-            cols = data.length / 2; // TODO: this should be able to be overwritten by jquery    
+            cols = g.recordCount;
         }        
         var barWidth = ((settings.width - (2 * settings.margin)) - (settings.gap * (cols + 1))) / cols; // calculate bar width based on total columns etc
 
         //Find the maximum value
         var maxVal = 0;
         var minVal = 0;
-        for (var i = cols; i < data.length; i++)
+        for (var r = 0; r < cols; r++)
         {
-            if (data[i] > maxVal)
+            var val = 0;
+            var stackVal = 0;
+            for (var s = 0; s < g.seriesCount; s++)
             {
-                maxVal = data[i];
+                val = Number(g.get(g.records[r],g.series[s]));                
+                if (settings.stack[s]==true)
+                {
+                    stackVal += val;
+                }
+                
             }
-            if (data[i] < minVal)
+            
+            if (val > maxVal)
             {
-                minVal = data[i];
+                maxVal = val;
+            }
+            if (val < minVal)
+            {
+                minVal = val
             }
         }
 
-
+        
         /////////////////////////
         //create canvas
         /////////////////////////
@@ -122,20 +135,20 @@
             drawLine(ctx, settings.borderCol, 1, point(settings.height - settings.margin, settings.margin), point(settings.height - settings.margin, settings.width - settings.margin));
             drawLine(ctx, settings.borderCol, 1, point(settings.height - settings.margin, settings.margin), point(settings.margin, settings.margin));
 
-            //Add the x axis values
+            //Add the x axis values (record values)
             for (var i = 0; i < cols; i++)
             {
                 var x = (barWidth / 2) + (settings.margin + (barWidth * i) + (settings.gap * (i + 1)));
-                canvasWrite(ctx, data[i], settings.height - settings.margin + 12, x, settings.fontSize, settings.font, settings.fontColor)
+                canvasWrite(ctx, g.records[i], settings.height - settings.margin + 12, x, settings.fontSize, settings.font, settings.fontColor)
             }
 
-            //Add the y axis values
+            //Add the y axis values (just the bar and numbers)
             var yVals = (maxVal - minVal) / settings.yScale;
             for (var i = minVal; i <= yVals; i++)
             {
                 var val = minVal + (settings.yScale * i);
                 var y = ((settings.height - settings.margin) - (settings.height - settings.margin * 2) / yVals * i) + settings.fontSize / 2;
-                canvasWrite(ctx, val, y, settings.margin - 12, settings.fontSize - 1, settings.font, settings.fontColor)
+                canvasWrite(ctx, val, y, settings.margin - 15, settings.fontSize - 1, settings.font, settings.fontColor)
             }
 
 
@@ -159,7 +172,7 @@
                 
                 var objects = objectsCollection();
                 
-                for (var series = 0; series < (data.length-cols)/cols; series++)
+                for (var series = 0; series < g.seriesCount; series++)
                 {
                     //previous point (0,0)
                     var oldPoint = null;
@@ -172,7 +185,9 @@
                     {
                         
                         offSet = cols + (cols * series);
-                        var originalval = data[offSet + i];
+                        //var originalval = data[offSet + i];
+                        var originalval = g.get(g.records[i],g.series[series]);
+                        
                         val = originalval * frac;
                                 
                     
@@ -185,7 +200,7 @@
                             
                             //What value to show?
                             if (settings.labels[series] == "value")  { displayVal = originalval; }
-                            if (settings.labels[series] == "name")   { displayVal = data[i];     }
+                            if (settings.labels[series] == "name")   { displayVal = g.records[i];     }
     
                             //Where to show it
                             var x = (settings.margin + (barWidth * i)) + (settings.gap * (i + 1)) + barWidth/2 - (settings.fontSize - 1)/2 ;
@@ -269,7 +284,9 @@
             }
         }
 
-        return $("#" + "canvas" + settings.randomNumber);
+        //return $("#" + "canvas" + settings.randomNumber);
+        return g;
+    
     };
 }(jQuery));
 
