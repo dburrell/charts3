@@ -8,15 +8,13 @@ Version 3 of jCharts is a complete rewrite from the ground up, with a focus on d
 
 jCharts is a pure javascript implementation of a variety of animated charts and graphs. 
 
-This project is released *completely free* under the GNU GPL v2 license which, amongst other things, prevents any liability to the creator for 
-
 
 ### Current Status
 In Development - no stable releases
 
 ### Usage
 
-Basic usage involves simply giving it a table of data to work with and let it do its thing, e.g. given an html table with data as below:
+The most straight forwards usage is to simply give it a table of data to work with and let it do its thing, e.g. given an html table with data as below:
 
 | -     | Maths | History |
 |-------|-------|---------|
@@ -43,3 +41,5 @@ License
 ----
 
 GNU GPL v2
+
+This project is released *completely free* under the GNU GPL v2 license which, amongst other things, prevents any liability to the creator for any damages caused.
