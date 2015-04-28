@@ -21,15 +21,12 @@ function debug(level, message)
     }
 }
 
-//Debug Alert
-
-function dAlert(level, message)
+//A lazy shortcut to debug
+function dbg(level,message)
 {
-    if (level <= settings.debugLevel)
-    {
-        alert("DEBUG [" + level + "]:: " + message);
-    }
+    debug(level,message);
 }
+
 
 
 //Stubbing
