@@ -46,6 +46,22 @@ function clog(s)
     console.log(s)
 }
 
+
+
+function fixLength(s,l)
+{
+    var returnMe = s;
+    var spaceCount = l - s.length;
+    
+    for (var i = 0; i < spaceCount; i++)
+    {
+        returnMe += " ";
+    }
+    
+    return returnMe;
+    //return "'" + returnMe + "'";
+}
+
 //Initialisation definition
 function init()
 {    

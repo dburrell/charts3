@@ -131,23 +131,23 @@ function graph(type)
 
         //add headers
         var line = "";
-        line += "-" + tab;
+        line += fixLength("-",15);
         for (x = 0; x < o.seriesCount; x++)
         {
-            line += o.series[x] + tab;
+            line += fixLength(o.series[x],15);
         }
+        
         clog(line);
-
 
         //add values
         for (y = 0; y < o.recordCount; y++)
         {
             line = "";
             //add left headers
-            line += o.records[y] + tab;
+            line += fixLength(o.records[y],15);
             for (x = 0; x < o.seriesCount; x++)
             {
-                line += o.values.get(x, y) + tab;
+                line += fixLength(o.values.get(x, y),15);
             }
             clog(line);
         }
