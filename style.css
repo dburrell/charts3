@@ -1,0 +1,24 @@
+body
+{
+    font-family: 'Roboto', sans-serif;    
+    color:#111;
+}
+.containerExample
+{
+    width:400px;
+    height:400px;
+    background:#A73;
+}
+
+table, td
+{
+    border-width:1px;
+    border-color:#ccc;
+    border-style:solid;
+    cell-spacing:0;
+    padding-top:1;
+    padding-bottom:1;
+    padding-left: 5;
+    padding-right:5;
+    border-collapse: collapse;
+}
