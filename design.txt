@@ -1,0 +1,14 @@
+graph  
+  type
+  headers[] (alice, bob)
+  series[]  (maths, history)
+  values = [,]
+  
+ 
+ 
+ 
+                          SERIES 1	      SERIES 2	      SERIES x  
+HEADERS	                  maths	          history	      series[x].name
+record 1    alice	      7	              1               series[x].values[0]
+record 2    bob	          3 	          3    	          series[x].values[1]
+record y    headers[y]    5               5               series[x].values[y]
