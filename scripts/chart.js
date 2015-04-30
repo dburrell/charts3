@@ -74,44 +74,13 @@
         {
             cols = g.recordCount;
         }        
-        var barWidth = ((settings.width - (2 * settings.margin)) - (settings.gap * (cols + 1))) / cols; // calculate bar width based on total columns etc
-
-        //Find the maximum value
-        var maxVal = 0;
-        var minVal = 0;
-        for (var r = 0; r < cols; r++)
-        {
-            var val = 0;
-            var stackVal = 0;
-            for (var s = 0; s < g.seriesCount; s++)
-            {
-                val = Number(g.get(g.records[r],g.series[s]));                
-                if (settings.stack[s]==true)
-                {
-                    stackVal += val;
-                }
-                
-            }
-            
-            if (val > maxVal)
-            {
-                maxVal = val;
-            }
-            if (val < minVal)
-            {
-                minVal = val
-            }
-        }
+       
+        
 
         
-        /////////////////////////
-        //create canvas
-        /////////////////////////
-
-        //Find pixels per value (i.e. ratio)
-        var valRatio = (settings.height - (2 * settings.margin)) / maxVal;
-
-        //Make the canvas
+        /////////////////////////////////
+        //create canvas ONCE
+        /////////////////////////////////
         var ctx = settings.ctx; 
         if (settings.ctx == null)
         {
@@ -120,171 +89,17 @@
             settings.ctx = ctx;
         }
         
-        /////////////////////////
-        //write values etc
-        /////////////////////////
-        draw(now(), true);
+        /////////////////////////////////
+        //Pass values into graph object
+        /////////////////////////////////        
+        g.settings = settings;
+        
+        /////////////////////////////////
+        //DRAW!
+        /////////////////////////////////
+        g.draw(now(),true);
         
         
-        function draw(startTime, first)
-        {
-            wipeCanvas("canvas" + settings.randomNumber);
-            
-            
-            //Add the borders 
-            drawLine(ctx, settings.borderCol, 1, point(settings.height - settings.margin, settings.margin), point(settings.height - settings.margin, settings.width - settings.margin));
-            drawLine(ctx, settings.borderCol, 1, point(settings.height - settings.margin, settings.margin), point(settings.margin, settings.margin));
-
-            //Add the x axis values (record values)
-            for (var i = 0; i < cols; i++)
-            {
-                var x = (barWidth / 2) + (settings.margin + (barWidth * i) + (settings.gap * (i + 1)));
-                canvasWrite(ctx, g.records[i], settings.height - settings.margin + 12, x, settings.fontSize, settings.font, settings.fontColor)
-            }
-
-            //Add the y axis values (just the bar and numbers)
-            var yVals = (maxVal - minVal) / settings.yScale;
-            for (var i = minVal; i <= yVals; i++)
-            {
-                var val = minVal + (settings.yScale * i);
-                var y = ((settings.height - settings.margin) - (settings.height - settings.margin * 2) / yVals * i) + settings.fontSize / 2;
-                canvasWrite(ctx, val, y, settings.margin - 15, settings.fontSize - 1, settings.font, settings.fontColor)
-            }
-
-
-            //Calculate the timing fraction
-            var frac = (now() - (startTime + (settings.fadeTime*1.5))) / settings.totalTime;
-            
-            //frac = 1;
-            if (frac < 0)
-            {
-                frac = 0;
-            }
-            if (frac > 1)
-            {
-                frac = 1;
-            }
-            
-           
-            if (frac > 0)
-            {
-                var series = 0;
-                
-                var objects = objectsCollection();
-                
-                for (var series = 0; series < g.seriesCount; series++)
-                {
-                    //previous point (0,0)
-                    var oldPoint = null;
-                
-                    //Clear the current objects
-                    objects.clear();
-                
-                    //Loop through values
-                    for (var i = 0; i < cols; i++)
-                    {
-                        
-                        offSet = cols + (cols * series);
-                        //var originalval = data[offSet + i];
-                        var originalval = g.get(g.records[i],g.series[series]);
-                        
-                        val = originalval * frac;
-                                
-                    
-                        ///////////////////////////////////////////
-                        //Add labels
-                        ///////////////////////////////////////////
-                        if (settings.labels[series] != "none")
-                        {                    
-                            var displayVal= "";
-                            
-                            //What value to show?
-                            if (settings.labels[series] == "value")  { displayVal = originalval; }
-                            if (settings.labels[series] == "name")   { displayVal = g.records[i];     }
-    
-                            //Where to show it
-                            var x = (settings.margin + (barWidth * i)) + (settings.gap * (i + 1)) + barWidth/2 - (settings.fontSize - 1)/2 ;
-                            var y = (settings.height - settings.margin) - (val * valRatio);
-                            
-                            var labelYOffset = settings.labelYOffset;                                            
-                            var newPoint = point (y + labelYOffset,x + settings.labelXOffset);
-    
-                            var o = labelObject(settings,newPoint,displayVal)                        
-                            objects.add(o);                        
-                        }
-                        
-                        ///////////////////////////////////////////
-                        //barchart version
-                        ///////////////////////////////////////////
-                        if (settings.drawBars[series])
-                        {                
-                            var p1 = point(settings.height - settings.margin, (settings.margin + (barWidth * i) + (settings.gap * (i + 1))));
-                            var p2 = point((settings.height - settings.margin) - (val * valRatio), (settings.margin + (barWidth * i)) + (settings.gap * (i + 1)) + barWidth);                        
-                            var o = barObject(settings,i,p1,p2);
-                            objects.add(o);
-                        }
-            
-                        ///////////////////////////////////////////
-                        //line version
-                        ///////////////////////////////////////////
-                        if (settings.drawLines[series])
-                        {
-                            var y = (settings.height - settings.margin) - (val * valRatio);
-                            var x = (settings.margin + (barWidth * i)) + (settings.gap * (i + 1)) + barWidth/2;
-                            var newPoint = point (y,x);
-                                         
-                            if (oldPoint == null)
-                            {
-                                oldPoint = newPoint;
-                            }
-                            var o = lineObject(settings, i, oldPoint, newPoint);
-                            objects.add(o);                                            
-                        }
-                                           
-                        ///////////////////////////////////////////
-                        //Scatter Graph
-                        ///////////////////////////////////////////
-                        if (settings.drawDots[series])
-                        {
-                            var y = (settings.height - settings.margin) - (val * valRatio);
-                            var x = (settings.margin + (barWidth * i)) + (settings.gap * (i + 1)) + barWidth/2;
-                            var newPoint = point (y,x);
-        
-                            var o = dotObject(settings,i,newPoint);
-                            objects.add(o);                        
-                        }
-    
-    
-                        //Push new point into old point
-                        oldPoint = newPoint;
-                       
-                    }
-                    
-                    //Draw all the objects
-                    objects.drawAll();              
-                }
-            }
-            
-            //clog("testing frac < 1")
-            if (frac < 1)
-            {
-                //clog("testing first == true")
-                if (first == true)
-                {
-                    //clog("first is true")
-                    $("#" + "canvas" + settings.randomNumber).fadeIn(settings.fadeTime);                    
-                    //clog("showing");
-                    setTimeout(function(){requestAnimationFrame(function(){draw(startTime, false)});},settings.fadeTime)
-                }
-                else
-                {
-                    requestAnimationFrame(function(){draw(startTime, false)});
-                }
-                
-            }
-        }
-
-        //return $("#" + "canvas" + settings.randomNumber);
         return g;
     
     };
@@ -478,15 +293,3 @@ function drawLine(ctx, col, lineWidth, p1, p2)
 
 
 
-///////////////////////////////////////////
-//General
-///////////////////////////////////////////
-function clog(s)
-{
-    console.log(s);
-}
-
-function now()
-{
-    return new Date().getTime();
-}
