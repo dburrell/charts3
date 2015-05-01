@@ -69,7 +69,7 @@
         //Default the seriesTypes to bar
         for(var i = 0; i <= g.seriesCount; i++)
         {        
-            settings.seriesTypes[i] = types.bar;
+            settings.seriesTypes[i] = types.stackedBar;
         } 
         
         //create canvas                

@@ -300,7 +300,7 @@ function graph(type)
                             var width = barWidth/totalBarCount;  //the actual width of each bar - barWidth will be used 
                             var p1 = point(o.settings.height - o.settings.margin, (barShifts[series] * width) + (o.settings.margin + ((barWidth * i)) + (o.settings.gap * (i + 1))));
                             var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (barShifts[series]* width) + (o.settings.margin + (barWidth * i)) + ((o.settings.gap * (i + 1)) + width) );
-                            var newObject = barObject(o.settings, i, p1, p2);
+                            var newObject = barObject(o.settings, series, p1, p2);
                             objects.add(newObject);
                             barCount++;
                         }
@@ -309,10 +309,11 @@ function graph(type)
                         //stacked barchart version
                         ///////////////////////////////////////////
                         if (o.settings.seriesTypes[series] == types.stackedBar)
-                        {                            
-                            var p1 = point((o.settings.height - o.settings.margin) - stackLevels[i], (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1))) + stackCount*5 );
-                            var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[i], (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth + stackCount*5);
-                            var newObject = barObject(o.settings, i, p1, p2);
+                        {
+                            var stackOffset = 0;    // for debugging, should be 0 in general
+                            var p1 = point((o.settings.height - o.settings.margin) - stackLevels[i], (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1))) + stackCount * stackOffset );
+                            var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[i], (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth + stackCount * stackOffset);
+                            var newObject = barObject(o.settings, series, p1, p2);
                             objects.add(newObject);
                             
                             //Stack specifics
