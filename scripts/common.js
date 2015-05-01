@@ -44,22 +44,43 @@ function clog(s)
 //String Functions
 ////////////////////////////////////////////////////
 
-//Fix the 
-function fixLength(s,l)
+//Add extra space to end of string
+function fixLength(s,l, e)
 {
+    
+    if (typeof (e) == "undefined")
+    {
+        e = '';
+    }
     var returnMe = s;
     var spaceCount = l - s.length;
+    
+    if (e != null)
+    {
+        spaceCount -= 2;
+    }
     
     for (var i = 0; i < spaceCount; i++)
     {
         returnMe += " ";
     }
     
-    return returnMe;
-    //return "'" + returnMe + "'";
+    returnMe = e + returnMe + e;
+    return returnMe;    
 }
 
 
+//Repeat Chars
+function repeatChar(s,n)
+{
+    var r = "";
+    for (var i = 0; i < n; i++)
+    {
+        r += s;
+    }
+    
+    return r;
+}
 
 
 ////////////////////////////////////////////////////

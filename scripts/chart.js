@@ -67,16 +67,13 @@
         
         var g = graph();
         g.convertTable(this);
-        //data = g.values.x[0];
         
         var cols = settings.cols;
         if (settings.cols < 0)
         {
             cols = g.recordCount;
         }        
-       
         
-
         
         /////////////////////////////////
         //create canvas ONCE
@@ -100,136 +97,13 @@
         g.draw(now(),true);
         
         
-        return g;
-    
+        return g;    
     };
 }(jQuery));
 
 
 
-///////////////////////////////////////////
-//Custom objects
-///////////////////////////////////////////
-function barObject(settings, i, p1, p2)
-{           
-    var o = {};
-    o.p1 = p1;
-    o.p2 = p2;
-    o.drawOrder = 0;
-    o.draw = function()
-    {        
-        var y1 = Math.min(p1.y, p2.y);
-        var y2 = Math.max(p1.y, p2.y);
-    
-        var x1 = Math.min(p1.x, p2.x);
-        var x2 = Math.max(p1.x, p2.x);
-    
-        y2 = y2 - y1;
-        x2 = x2 - x1;
-    
-        settings.ctx.fillStyle = settings.colours[i];
-        settings.ctx.strokeStyle = settings.lineCol;
-        settings.ctx.moveTo(x1, y1);
-    
-        settings.ctx.fillRect(x1, y1, x2, y2);
-        settings.ctx.rect(x1, y1, x2, y2);
-    };
-    
-    return o;
-}
 
-function lineObject(settings, i, p1 ,p2)
-{
-    var o = {};
-    o.p1 = p1;
-    o.p2 = p2;
-    o.drawOrder = 0;
-    o.draw = function()
-    {
-       drawLine(settings.ctx, settings.lineCol, settings.lineWidth, p1, p2) ;
-    }
-    return o;
-}
-
-function dotObject(settings,i,p)
-{
-    var o = {};
-    o.p1 = p;
-    o.drawOrder = 1;
-    o.draw = function()
-    {        
-        settings.ctx.beginPath();
-        settings.ctx.arc(p.x, p.y, settings.lineWidth*1.5, 0, 2 * Math.PI, false);
-        settings.ctx.fillStyle = settings.dotFill;
-        settings.ctx.fill();
-        settings.ctx.lineWidth = settings.lineWidth;
-        settings.ctx.strokeStyle = settings.dotFill;
-        settings.ctx.stroke();
-    }
-    return o;
-}
-
-function labelObject(settings,p,text)
-{
-    var o = {};
-    o.text = text;
-    o.p1 = p;
-    o.drawOrder = 99;
-    o.draw = function()
-    {
-        canvasWrite(settings.ctx, text, o.p1.y, o.p1.x, settings.fontSize - 1, settings.font, settings.fontColor)                                        
-    }
-    return o;
-}
-
-function objectsCollection()
-{
-    var o = {};
-    o.maxOrder = 0;
-
-    o.add = function(child)
-    {
-        o.objects[o.count] = child;
-        o.count++;
-        o.maxOrder = Math.max(o.maxOrder, child.drawOrder);
-    };
-    o.clear = function()
-    {
-        o.count = 0;
-        o.objects = [];
-    };
-    o.get = function(i)
-    {
-        if (i < o.count)
-        {
-            return o.objects[i];
-        }
-        else
-        {
-            return null;
-        }
-    };
-    o.drawAll = function()
-    {
-        for (var d = 0; d <= o.maxOrder; d++)
-        {            
-            for (var i = 0; i < o.count; i++)
-            {
-                
-                var child = o.get(i);
-                if (child.drawOrder == d)
-                {
-                    child.draw();
-                }                
-            }
-        }
-
-    }
-
-
-    o.clear();
-    return o;
-}
 
 
 
