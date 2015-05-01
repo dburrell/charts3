@@ -36,7 +36,7 @@
             
             
             //Labels
-            labels: ["name","none","name"],                         // none/name/value - what to show on labels
+            labels: ["none","none","none"],                         // none/name/value - what to show on labels
             labelYOffset: 14,                                       // Y offset positioning of labels
             labelXOffset: 3,                                        // X offset positioning of labels
             
@@ -56,7 +56,11 @@
             drawDots: [false,true,false],
             dotFill: '#eaeaea',
             
-            seriesTypes: []            
+            //Types
+            seriesTypes: [],
+            //defaultType: types.stackedBar
+            defaultType: types.bar
+                        
         }, options);
 
 
@@ -69,7 +73,7 @@
         //Default the seriesTypes to bar
         for(var i = 0; i <= g.seriesCount; i++)
         {        
-            settings.seriesTypes[i] = types.stackedBar;
+            settings.seriesTypes[i] = settings.defaultType;
         } 
         
         //create canvas                
@@ -96,12 +100,35 @@
 ///////////////////////////////////////////
 //Canvas functions
 ///////////////////////////////////////////
-function canvasWrite(ctx, txt, y, x, fontSize, font, color)
+function canvasWrite(ctx, txt, y, x, fontSize, font, color, align)
 {
+    if (align == undefined)
+    {
+        align = hAlign.left;
+    }
+    
+    
     ctx.font = fontSize + "px " + font;
     ctx.fillStyle = color;
+    
+    if (align == hAlign.right)
+    {
+        var txtMeasure = ctx.measureText(txt); // TextMetrics object
+        txtMeasure.width; // 16;
+        x = x - txtMeasure.width;
+    }
+    
+    if (align == hAlign.centre)
+    {
+        var txtMeasure = ctx.measureText(txt); // TextMetrics object
+        txtMeasure.width; // 16;
+        x = x - (txtMeasure.width/2);
+    }
+                
     ctx.fillText(txt, x, y);
 }
+
+
 
 function makeCanvas(id, bgCol, height, width, position, left, top)
 {

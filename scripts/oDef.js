@@ -76,6 +76,12 @@ function graph(type)
         }
     }
 
+    //Set a different series type
+    o.setSeriesType = function(i,n)
+    {
+        o.settings.seriesTypes[i] = n;
+    };
+    
     //Import data from a table
     o.convertTable = function(tableSearchString)
     {
@@ -149,7 +155,7 @@ function graph(type)
             for (var i = 0; i < o.recordCount; i++)
             {
                 var x = (barWidth / 2) + (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1)));
-                canvasWrite(ctx, o.records[i], o.settings.height - o.settings.margin + 12, x, o.settings.fontSize, o.settings.font, o.settings.fontColor)
+                canvasWrite(ctx, o.records[i], o.settings.height - o.settings.margin + 12, x, o.settings.fontSize, o.settings.font, o.settings.fontColor, hAlign.centre)
             }
 
 
@@ -196,7 +202,7 @@ function graph(type)
             {
                 var val = minVal + (o.settings.yScale * i);
                 var y = ((o.settings.height - o.settings.margin) - (o.settings.height - o.settings.margin * 2) / yVals * i) + o.settings.fontSize / 2;
-                canvasWrite(ctx, val, y, o.settings.margin - 15, o.settings.fontSize - 1, o.settings.font, o.settings.fontColor)
+                canvasWrite(ctx, val, y, o.settings.margin - 3, o.settings.fontSize - 1, o.settings.font, o.settings.fontColor,hAlign.right)
             }
 
             o.settings.fadeTime = 0;
@@ -489,6 +495,14 @@ function array2d()
      scatter: 4
  });
 
+//Horizontal Alignment
+ var hAlign = $.extend(
+ {
+     left: 1,
+     centre: 2,
+     right: 3     
+ });
+
 
 
 
@@ -568,7 +582,7 @@ function labelObject(settings, p, text)
     o.drawOrder = 99;
     o.draw = function()
     {
-        canvasWrite(settings.ctx, text, o.p1.y, o.p1.x, settings.fontSize - 1, settings.font, settings.fontColor)
+        canvasWrite(settings.ctx, text, o.p1.y, o.p1.x, settings.fontSize - 1, settings.font, settings.fontColor,hAlign.left)
     }
     return o;
 }
