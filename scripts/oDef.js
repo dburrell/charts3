@@ -25,7 +25,7 @@ function graph(type)
         o.series[o.seriesCount] = s;
         o.seriesCount++;
     };
-
+    
     //Add a record holder with name (and optionally vals)
     o.addRecord = function(s, vals)
     {
@@ -217,7 +217,31 @@ function graph(type)
                 {
                     stackLevels[records] = 0;
                 }
+                
+                //Starting variables
                 var stackCount = 0;
+                var totalBarCount = 0;
+                var totalBarsWide = 0;
+                
+                //Calcualte individual bar widths
+                var barShifts = [];
+                var stackCounted = 0
+                for (var series = 0; series < o.seriesCount; series++)
+                {
+                    if (o.settings.seriesTypes[series] == types.bar)
+                    {
+                        barShifts[series] = totalBarCount;
+                        totalBarCount ++;
+                    }
+                    if (o.settings.seriesTypes[series] == types.stackedBar && stackCounted == 0)
+                    {
+                        barShifts[series] = totalBarCount;
+                        stackCounted = 1;
+                        totalBarCount ++;
+                    }
+                }
+                
+                
                                 
                 var objects = objectsCollection();
 
@@ -229,13 +253,14 @@ function graph(type)
                     //Clear the current objects
                     objects.clear();
 
+                    var barCount = 0;
+                    
                     //Loop through values
                     for (var i = 0; i < o.recordCount; i++)
                     {
                         offSet = o.recordCount + (o.recordCount * series);
-                        //var originalval = data[offSet + i];
+                        
                         var originalval = o.get(o.records[i], o.series[series]);
-
                         val = originalval * frac;
 
 
@@ -272,10 +297,12 @@ function graph(type)
                         ///////////////////////////////////////////
                         if (o.settings.seriesTypes[series] == types.bar)
                         {
-                            var p1 = point(o.settings.height - o.settings.margin, (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1))));
-                            var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth);
+                            var width = barWidth/totalBarCount;  //the actual width of each bar - barWidth will be used 
+                            var p1 = point(o.settings.height - o.settings.margin, (barShifts[series] * width) + (o.settings.margin + ((barWidth * i)) + (o.settings.gap * (i + 1))));
+                            var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (barShifts[series]* width) + (o.settings.margin + (barWidth * i)) + ((o.settings.gap * (i + 1)) + width) );
                             var newObject = barObject(o.settings, i, p1, p2);
                             objects.add(newObject);
+                            barCount++;
                         }
                         
                         ///////////////////////////////////////////
@@ -291,6 +318,10 @@ function graph(type)
                             //Stack specifics
                             stackLevels[i] += (val * valRatio);         // The next stacked bar in this record will start from here
                             stackCount++;                               // The next stacked bar will shift over by 1
+                            if (stackCount == 0)
+                            {
+                                barCount++;
+                            }
                         }
 
                         ///////////////////////////////////////////
@@ -444,18 +475,28 @@ function array2d()
 }
 
 
+///////////////////////////////////////////
+//Custom static objects
+///////////////////////////////////////////
+
+//Types of chart for each series
+ var types = $.extend(
+ {
+     bar: 1,
+     stackedBar: 2,
+     line: 3,
+     scatter: 4
+ });
+
+
+
+
 
 ///////////////////////////////////////////
 //Custom object templates
 ///////////////////////////////////////////
 
-//Types of chart for each series
-var types = {};
-types.bar = 1;     
-types.stackedBar = 2;
-types.line = 3;
-types.scatter = 4;
-
+//Bar object template
 function barObject(settings, i, p1, p2)
 {
     var o = {};
@@ -484,6 +525,7 @@ function barObject(settings, i, p1, p2)
     return o;
 }
 
+//Line object template
 function lineObject(settings, i, p1, p2)
 {
     var o = {};
@@ -497,6 +539,7 @@ function lineObject(settings, i, p1, p2)
     return o;
 }
 
+//Dot object template
 function dotObject(settings, i, p)
 {
     var o = {};
@@ -515,6 +558,7 @@ function dotObject(settings, i, p)
     return o;
 }
 
+//Label object template
 function labelObject(settings, p, text)
 {
     var o = {};
@@ -528,6 +572,7 @@ function labelObject(settings, p, text)
     return o;
 }
 
+//Objects collection
 function objectsCollection()
 {
     var o = {};

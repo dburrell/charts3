@@ -61,50 +61,28 @@
 
 
         /////////////////////////
-        //grab the data
-        /////////////////////////
-        //var data = this.html();
-        //data = data.split(settings.splitCharacter)
-        
-        
-        var g = graph();
-        g.convertTable(this);
+        //make a graph object
+        /////////////////////////     
+        var g = graph();            // make an object
+        g.convertTable(this);       // import data
         
         //Default the seriesTypes to bar
         for(var i = 0; i <= g.seriesCount; i++)
         {        
-            settings.seriesTypes[i] = types.stackedBar;
+            settings.seriesTypes[i] = types.bar;
         } 
         
-        //Import settings to the graph object
-        var cols = settings.cols;
-        if (settings.cols < 0)
-        {
-            cols = g.recordCount;
-        }
-        
-       
-        
-        
-        /////////////////////////////////
-        //create canvas ONCE
-        /////////////////////////////////
-        var ctx = settings.ctx; 
+        //create canvas                
         if (settings.ctx == null)
         {
-            ctx = makeCanvas("canvas" + settings.randomNumber, settings.bgCol, settings.height, settings.width, settings.position, settings.left, settings.top);
-            $("#" + "canvas" + settings.randomNumber).hide();
-            settings.ctx = ctx;
+            settings.ctx = makeCanvas("canvas" + settings.randomNumber, settings.bgCol, settings.height, settings.width, settings.position, settings.left, settings.top);
+            $("#" + "canvas" + settings.randomNumber).hide();            
         }
-        
-        /////////////////////////////////
+                
         //Pass values into graph object
-        /////////////////////////////////        
         g.settings = settings;
-        
-        /////////////////////////////////
+                
         //Return the object
-        /////////////////////////////////                
         return g;    
     };
 }(jQuery));
