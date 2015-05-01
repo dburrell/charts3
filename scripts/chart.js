@@ -2,7 +2,6 @@
 //Define jQuery function
 (function($)
 {
-
     $.fn.jChart = function(options)
     {
         /////////////////////////
@@ -13,47 +12,46 @@
             //General                            
             randomNumber: Math.round(Math.random() * 100),          // Random number for the chart ID
             ctx: null,                                              // Context
-            cols: -1,                                               // Number of columns per series
-            splitCharacter: ",",                                    // How to split the original data
+            cols: -1,                                               // Number of columns per series            
             position: 'absolute',                                   // CSS Positioning of the canvas
-            top: 0,                                                 // Top Position (CSS)
-            left: 0,                                                // Left Position (CSS)
+            
+            //Colouring
             font: "'Titillium Web', sans-serif",                    // Font face
             fontColor: '#888',                                      // Font colour
             fontSize: 12,                                           // Font size
-            bgCol: "transparent",                                   // Canvas Background Colour
+            bgCol: "transparent",                                   // Canvas Background Colour            
+            lineCol: "#333",                                        // For line chart or outside of bars
+            
+            //Timing
+            totalTime: 700,                                         // Time (ms) for animation
+            fadeTime: 400,                                          // Time (ms) for fading in first
+                                        
+            //Positioning
+            top: 0,                                                 // Top Position (CSS)
+            left: 0,                                                // Left Position (CSS)
             width: 300,                                             // Width of canvas
             height: 300,                                            // Height of canvas
             margin: 40,                                             // Margin around drawarea
-            lineCol: "#333",                                        // For line chart or outside of bars
-            totalTime: 700,                                         // Time (ms) for animation
-            fadeTime: 400,                                          // Time (ms) for fading in first
-                    
             
             //Axis info
             borderCol: "#aaa",                                      // For the axis borders                        
             yScale: 10,                                              // incremental values on y axis
-            
-            
+                        
             //Labels
             labels: ["none","none","none"],                         // none/name/value - what to show on labels
             labelYOffset: 14,                                       // Y offset positioning of labels
             labelXOffset: 3,                                        // X offset positioning of labels
             
-            //Bar chart specifics
-            drawBars: [true,false,false],
-            stack:[true,false,false],
+            //Bar chart specifics            
             colours: ['#3498db', '#e67e22', '#16a085', '#34495e', '#e74c3c', '#95a5a6', '#1abc9c', '#f1c40f'],                                    
             gap: 10,
             
-            //Line chart specifics
-            drawLines: [false,true,false],
+            //Line chart specifics            
             lineWidth: 2,                                            // line width
             dots: true,
             shadeUnderLine: true,
                            
-            //Scatter graph specifics
-            drawDots: [false,true,false],
+            //Scatter graph specifics           
             dotFill: '#eaeaea',
             
             //Types
@@ -80,7 +78,15 @@
         if (settings.ctx == null)
         {
             settings.ctx = makeCanvas("canvas" + settings.randomNumber, settings.bgCol, settings.height, settings.width, settings.position, settings.left, settings.top);
-            $("#" + "canvas" + settings.randomNumber).hide();            
+            $("#" + "canvas" + settings.randomNumber).hide();
+            
+            //On mouse over of this canvas, 
+            $( "#canvas" + settings.randomNumber).mousemove(function( event )
+            {                
+                var y = event.pageY;
+                var x = event.pageX;
+                g.mouseOver(y,x);                
+            });
         }
                 
         //Pass values into graph object

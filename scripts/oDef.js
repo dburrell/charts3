@@ -18,6 +18,8 @@ function graph(type)
 
     o.settings = {}; //this will get filled in by the constructor
 
+    o.objects = objectsCollection();
+    
     //Add a series holder with name
     o.addSeries = function(s)
     {
@@ -249,7 +251,7 @@ function graph(type)
                 
                 
                                 
-                var objects = objectsCollection();
+                //var objects = objectsCollection();
 
                 for (var series = 0; series < o.seriesCount; series++)
                 {
@@ -257,7 +259,7 @@ function graph(type)
                     var oldPoint = null;
 
                     //Clear the current objects
-                    objects.clear();
+                    o.objects.clear();
 
                     var barCount = 0;
                     
@@ -307,7 +309,7 @@ function graph(type)
                             var p1 = point(o.settings.height - o.settings.margin, (barShifts[series] * width) + (o.settings.margin + ((barWidth * i)) + (o.settings.gap * (i + 1))));
                             var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (barShifts[series]* width) + (o.settings.margin + (barWidth * i)) + ((o.settings.gap * (i + 1)) + width) );
                             var newObject = barObject(o.settings, series, p1, p2);
-                            objects.add(newObject);
+                            o.objects.add(newObject);
                             barCount++;
                         }
                         
@@ -320,7 +322,7 @@ function graph(type)
                             var p1 = point((o.settings.height - o.settings.margin) - stackLevels[i], (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1))) + stackCount * stackOffset );
                             var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[i], (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth + stackCount * stackOffset);
                             var newObject = barObject(o.settings, series, p1, p2);
-                            objects.add(newObject);
+                            o.objects.add(newObject);
                             
                             //Stack specifics
                             stackLevels[i] += (val * valRatio);         // The next stacked bar in this record will start from here
@@ -345,7 +347,7 @@ function graph(type)
                                 oldPoint = newPoint;
                             }
                             var newObject = lineObject(o.settings, i, oldPoint, newPoint);
-                            objects.add(newObject);
+                            o.objects.add(newObject);
                         }
 
                         ///////////////////////////////////////////
@@ -358,7 +360,7 @@ function graph(type)
                             var newPoint = point(y, x);
 
                             var newObject = dotObject(o.settings, i, newPoint);
-                            objects.add(newObject);
+                            o.objects.add(newObject);
                         }
 
 
@@ -368,7 +370,7 @@ function graph(type)
                     }
 
                     //Draw all the objects
-                    objects.drawAll();
+                    o.objects.drawAll();
                 }
             }
 
@@ -440,6 +442,15 @@ function graph(type)
         return null;
     };
 
+    
+    
+    o.mouseOver = function(y,x)
+    {
+        y -= o.settings.top;
+        x -= o.settings.left;
+        clog("interpreting mouse at y=" + y + ", x=" + x);
+        
+    }
     return o;
 }
 
@@ -537,6 +548,18 @@ function barObject(settings, i, p1, p2)
         settings.ctx.rect(x1, y1, x2, y2);
     };
 
+    o.touching = function(y,x)
+    {
+        if (between(y,y1,y2) && between (x,x1,x2))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    
     return o;
 }
 
@@ -582,7 +605,7 @@ function labelObject(settings, p, text)
     o.drawOrder = 99;
     o.draw = function()
     {
-        canvasWrite(settings.ctx, text, o.p1.y, o.p1.x, settings.fontSize - 1, settings.font, settings.fontColor,hAlign.left)
+        canvasWrite(settings.ctx, text, o.p1.y, o.p1.x, settings.fontSize - 1, settings.font, settings.fontColor,hAlign.le)
     }
     return o;
 }

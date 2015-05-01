@@ -45,7 +45,7 @@ function clog(s)
 
 
 ////////////////////////////////////////////////////
-//String Functions
+//String/int Functions
 ////////////////////////////////////////////////////
 
 //Add extra space to end of string
@@ -73,7 +73,6 @@ function fixLength(s,l, e)
     return returnMe;    
 }
 
-
 //Repeat Chars
 function repeatChar(s,n)
 {
@@ -84,6 +83,19 @@ function repeatChar(s,n)
     }
     
     return r;
+}
+
+//is a between b & c (INCLUSIVE)
+function between(a,b,c)
+{
+    if (a >= b && a <= c)
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 
