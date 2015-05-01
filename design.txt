@@ -1,14 +1,28 @@
+=========================
+GRAPH OBJECT DESIGN
+=========================
 graph  
   type
   headers[] (alice, bob)
   series[]  (maths, history)
   values = [,]
+  draw()
   
- 
- 
- 
                           SERIES 1	      SERIES 2	      SERIES x  
 HEADERS	                  maths	          history	      series[x].name
-record 1    alice	      7	              1               series[x].values[0]
-record 2    bob	          3 	          3    	          series[x].values[1]
-record y    headers[y]    5               5               series[x].values[y]
+record 1    alice	      7	              1               values.get(1,x)
+record 2    bob	          3 	          3    	          values.get(2,x)
+record y    headers[y]    5               5               values.get(y,x)
+
+
+
+=========================
+ASSUMPTION
+=========================
+Stacked columns will be listed next to each other, so for example:
+
+  Rent (stacked)
+  Target(line)
+  Bills(stacked)
+  
+Would not work, because the stacked Bills column will not start above the end of rent

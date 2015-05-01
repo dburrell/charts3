@@ -54,8 +54,9 @@
                            
             //Scatter graph specifics
             drawDots: [false,true,false],
-            dotFill: '#eaeaea'
+            dotFill: '#eaeaea',
             
+            seriesTypes: []            
         }, options);
 
 
@@ -65,14 +66,24 @@
         //var data = this.html();
         //data = data.split(settings.splitCharacter)
         
+        
         var g = graph();
         g.convertTable(this);
         
+        //Default the seriesTypes to bar
+        for(var i = 0; i <= g.seriesCount; i++)
+        {        
+            settings.seriesTypes[i] = types.stackedBar;
+        } 
+        
+        //Import settings to the graph object
         var cols = settings.cols;
         if (settings.cols < 0)
         {
             cols = g.recordCount;
-        }        
+        }
+        
+       
         
         
         /////////////////////////////////
@@ -92,11 +103,8 @@
         g.settings = settings;
         
         /////////////////////////////////
-        //DRAW!
-        /////////////////////////////////
-        g.draw(now(),true);
-        
-        
+        //Return the object
+        /////////////////////////////////                
         return g;    
     };
 }(jQuery));

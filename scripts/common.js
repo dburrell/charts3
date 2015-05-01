@@ -15,6 +15,10 @@ init();
 //Debug
 function debug(level, message)
 {
+    // 1 for positions
+    // 2 for debug notes ("x is 5")
+    // 3 
+    
     if (level <= settings.debugLevel)
     {
         clog("DEBUG [" + level + "]:: " + message);

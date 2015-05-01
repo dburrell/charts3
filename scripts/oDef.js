@@ -66,9 +66,7 @@ function graph(type)
         {
             var y = o.recordNames[recordKey];
             var x = o.seriesNames[seriesKey];
-
-            o.values.add(x, y, val);
-
+            o.values.set(x, y, val);
             return true;
         }
         catch (e)
@@ -134,7 +132,9 @@ function graph(type)
         }
         else
         {
-
+            var stackLevels = [];
+        
+        
             var barWidth = ((o.settings.width - (2 * o.settings.margin)) - (o.settings.gap * (o.recordCount + 1))) / o.recordCount; // calculate bar width based on total columns etc
 
             var ctx = o.settings.ctx;
@@ -157,6 +157,7 @@ function graph(type)
             //Find the maximum value
             var maxVal = 0;
             var minVal = 0;
+            var maxStack = 0;
             for (var r = 0; r < o.recordCount; r++)
             {
                 var val = 0;
@@ -164,23 +165,27 @@ function graph(type)
                 for (var s = 0; s < o.seriesCount; s++)
                 {
                     val = Math.max(Number(o.get(o.records[r], o.series[s])), val);
-                    if (o.settings.stack[s] == true)
+                    if (o.settings.seriesTypes[s] == types.stackedBar)
                     {
                         stackVal += val;
                     }
-
                 }
 
+                
                 if (val > maxVal)
                 {
                     maxVal = val;
                 }
                 if (val < minVal)
                 {
-                    minVal = val
+                    minVal = val                
                 }
+                
+                maxStack = Math.max(maxStack,stackVal);
             }
 
+            maxVal = Math.max(maxStack,maxVal);
+            
             //Find pixels per value (i.e. ratio)
             var valRatio = (o.settings.height - (2 * o.settings.margin)) / maxVal;
 
@@ -194,16 +199,26 @@ function graph(type)
                 canvasWrite(ctx, val, y, o.settings.margin - 15, o.settings.fontSize - 1, o.settings.font, o.settings.fontColor)
             }
 
+            o.settings.fadeTime = 0;
+            
             //Calculate the timing fraction
             var frac = (now() - (startTime + (o.settings.fadeTime * 1.5))) / o.settings.totalTime;
 
             frac = Math.max(0, frac); // frac must not be below 0
             frac = Math.min(1, frac); // frac must not be above 1
 
+            
+            
             if (frac > 0)
             {
-                var series = 0;
-
+                //Init stack levels - these will increase as stacked bars are added
+                var stackLevels = [];
+                for (var records = 0; records < o.recordCount; records++)
+                {
+                    stackLevels[records] = 0;
+                }
+                var stackCount = 0;
+                                
                 var objects = objectsCollection();
 
                 for (var series = 0; series < o.seriesCount; series++)
@@ -217,7 +232,6 @@ function graph(type)
                     //Loop through values
                     for (var i = 0; i < o.recordCount; i++)
                     {
-
                         offSet = o.recordCount + (o.recordCount * series);
                         //var originalval = data[offSet + i];
                         var originalval = o.get(o.records[i], o.series[series]);
@@ -256,18 +270,33 @@ function graph(type)
                         ///////////////////////////////////////////
                         //barchart version
                         ///////////////////////////////////////////
-                        if (o.settings.drawBars[series])
+                        if (o.settings.seriesTypes[series] == types.bar)
                         {
                             var p1 = point(o.settings.height - o.settings.margin, (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1))));
                             var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth);
                             var newObject = barObject(o.settings, i, p1, p2);
                             objects.add(newObject);
                         }
+                        
+                        ///////////////////////////////////////////
+                        //stacked barchart version
+                        ///////////////////////////////////////////
+                        if (o.settings.seriesTypes[series] == types.stackedBar)
+                        {                            
+                            var p1 = point((o.settings.height - o.settings.margin) - stackLevels[i], (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1))) + stackCount*5 );
+                            var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[i], (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth + stackCount*5);
+                            var newObject = barObject(o.settings, i, p1, p2);
+                            objects.add(newObject);
+                            
+                            //Stack specifics
+                            stackLevels[i] += (val * valRatio);         // The next stacked bar in this record will start from here
+                            stackCount++;                               // The next stacked bar will shift over by 1
+                        }
 
                         ///////////////////////////////////////////
                         //line version
                         ///////////////////////////////////////////
-                        if (o.settings.drawLines[series])
+                        if (o.settings.seriesTypes[series] == types.line)
                         {
                             var y = (o.settings.height - o.settings.margin) - (val * valRatio);
                             var x = (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth / 2;
@@ -284,7 +313,7 @@ function graph(type)
                         ///////////////////////////////////////////
                         //Scatter Graph
                         ///////////////////////////////////////////
-                        if (o.settings.drawDots[series])
+                        if (o.settings.seriesTypes[series] == types.scatter)
                         {
                             var y = (o.settings.height - o.settings.margin) - (val * valRatio);
                             var x = (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth / 2;
@@ -416,21 +445,16 @@ function array2d()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////
-//Custom objects
+//Custom object templates
 ///////////////////////////////////////////
+
+//Types of chart for each series
+var types = {};
+types.bar = 1;     
+types.stackedBar = 2;
+types.line = 3;
+types.scatter = 4;
 
 function barObject(settings, i, p1, p2)
 {
