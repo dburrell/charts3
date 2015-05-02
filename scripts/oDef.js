@@ -132,8 +132,7 @@ function graph(type)
 
     //Animated Draw Function
     o.draw = function(startTime, first, animated)
-    {
-        clog("touched is " + o.settings.touchedObject);
+    {        
         if (animated == undefined)
         {
             animated = true;            
@@ -216,8 +215,7 @@ function graph(type)
             frac = Math.min(1, frac); // frac must not be above 1
 
             if (!animated)
-            {
-                debug(2,"drawing non-animated");
+            {                
                 frac = 1;
             }
             
@@ -457,17 +455,24 @@ function graph(type)
             var obj = o.objects.objects[i];
             if (obj.touching(y,x))
             {
-                touchingSomething = i;
-                clog("touching object " + i);
+                touchingSomething = i;                
             }            
         }
         if (touchingSomething < 0)
         {
             o.settings.touchedObject = -1;
+            $('#tooltip' + o.settings.randomNumber).remove();
         }
         else
         {
-            o.settings.touchedObject = touchingSomething;            
+            o.settings.touchedObject = touchingSomething;
+            var series = Math.floor(touchingSomething/o.recordCount);
+            var record = touchingSomething - (series * o.recordCount);
+                    
+            var contents = "" + o.records[record] + "/" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
+                    
+            tooltip('tooltip' + o.settings.randomNumber, 'tooltip' + o.settings.randomNumber,y,x,contents)
+            
         }
         o.draw(now(),true,false);
         
@@ -561,22 +566,22 @@ function barObject(settings, i, p1, p2, id)
 
         y2 = y2 - y1;
         x2 = x2 - x1;
-
         
         if (id == settings.touchedObject)
-        {            
-            settings.ctx.strokeStyle = '#000'
-            settings.ctx.fillStyle = '#000';
+        {                        
+            settings.ctx.globalAlpha=0.4;
         }
         else
         {            
-            settings.ctx.strokeStyle = settings.lineCol;
-            settings.ctx.fillStyle = settings.colours[i];
+            settings.ctx.globalAlpha=1;
         }
+        settings.ctx.strokeStyle = settings.lineCol;
+        settings.ctx.fillStyle = settings.colours[i];
         
         settings.ctx.moveTo(x1, y1);
         settings.ctx.fillRect(x1, y1, x2, y2);
         settings.ctx.rect(x1, y1, x2, y2);
+        settings.ctx.globalAlpha=1;
     };
 
     

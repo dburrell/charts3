@@ -11,8 +11,30 @@ init();
 ////////////////////////////////////////////////////
 //tooltip
 function tooltip(id,classes,y,x,contents)
-{
+{    
+    //remove existing one
+    $("." + classes).remove();  
+
+    //Create div
     
+    var style = "";
+    style += "position:absolute;";  // position absolute (moves)
+    style += "top:" + y + "px;"     // top position
+    style += "left:" + x + "px;";   // left position
+    
+    style += "background:#333;"     // background color
+    style += "color:#FFF;"          // font color
+    
+    style += "padding:5px;"        // padding around the text
+    
+    style += "margin-top:15px;"     // keep it just below the mouse
+    style += "margin-left:15px;"    // keep it to right of mouse
+    
+    
+    var $newdiv1 = $( "<div id='" + id + "' class='" + classes + "' style='" + style + "'>" + contents + "</div>" );
+    
+    //Append newly created
+    $( "body" ).append($newdiv1);    
 }
 
 
