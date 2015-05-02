@@ -18,18 +18,23 @@ function tooltip(id,classes,y,x,contents)
     //Create div
     
     var style = "";
-    style += "position:absolute;";  // position absolute (moves)
+    style += "position:absolute;"   // position absolute (moves)
     style += "top:" + y + "px;"     // top position
-    style += "left:" + x + "px;";   // left position
+    style += "left:" + x + "px;"    // left position
     
-    style += "background:#333;"     // background color
-    style += "color:#FFF;"          // font color
+    style += "background:rgba(200,200,200,0.8);"     // background color
+    style += "color:#000;"          // font color
+    style += "border:1px solid #000;"     // background color
     
     style += "padding:5px;"        // padding around the text
     
     style += "margin-top:15px;"     // keep it just below the mouse
     style += "margin-left:15px;"    // keep it to right of mouse
     
+    style += "border-radius:5px;"  // rounded corners
+    
+    style += "font-family:courier;" // monospaced font
+    style += "font-size:12px;"      // small writing
     
     var $newdiv1 = $( "<div id='" + id + "' class='" + classes + "' style='" + style + "'>" + contents + "</div>" );
     
@@ -83,27 +88,20 @@ function clog(s)
 ////////////////////////////////////////////////////
 
 //Add extra space to end of string
-function fixLength(s,l, e)
+function fixLength(s,l, repeatChar)
 {
-    
-    if (typeof (e) == "undefined")
+    if (repeatChar == undefined)
     {
-        e = '';
+        repeatChar = " ";
     }
     var returnMe = s;
-    var spaceCount = l - s.length;
-    
-    if (e != null)
-    {
-        spaceCount -= 2;
-    }
+    var spaceCount = l - s.length;  
     
     for (var i = 0; i < spaceCount; i++)
     {
-        returnMe += " ";
+        returnMe += repeatChar;
     }
     
-    returnMe = e + returnMe + e;
     return returnMe;    
 }
 
@@ -132,7 +130,17 @@ function between(a,b,c)
     }
 }
 
-
+function near(x,nearToAmount,nearToFlexibility)
+{
+    if (between(x,nearToAmount-nearToFlexibility,nearToAmount+nearToFlexibility))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 
 ////////////////////////////////////////////////////

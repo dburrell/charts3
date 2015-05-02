@@ -45,6 +45,10 @@
             //Currently touched objects
             touchedObject: -1,
             
+            //Tooltip settings
+            tooltipContents:toolTipContentTypes.fullSeries,
+            tooltipPercentages: true,
+            
             //Bar chart specifics            
             colours: ['#3498db', '#e67e22', '#16a085', '#34495e', '#e74c3c', '#95a5a6', '#1abc9c', '#f1c40f'],                                    
             gap: 10,

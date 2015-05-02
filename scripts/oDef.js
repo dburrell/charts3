@@ -357,8 +357,8 @@ function graph(type)
                             var y = (o.settings.height - o.settings.margin) - (val * valRatio);
                             var x = (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth / 2;
                             var newPoint = point(y, x);
-
-                            var newObject = dotObject(o.settings, i, newPoint);
+                            var id = (o.recordCount*series) + i;
+                            var newObject = dotObject(o.settings, i, newPoint, id);
                             o.objects.add(newObject);
                         }
 
@@ -440,9 +440,8 @@ function graph(type)
 
         return null;
     };
-
     
-    
+    //Mouse over the graph object
     o.mouseOver = function(y,x)
     {
         y -= o.settings.top;
@@ -469,7 +468,71 @@ function graph(type)
             var series = Math.floor(touchingSomething/o.recordCount);
             var record = touchingSomething - (series * o.recordCount);
                     
-            var contents = "" + o.records[record] + "/" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
+            var contents = "";
+            
+            switch (o.settings.tooltipContents)
+            {
+                case toolTipContentTypes.record:
+                    contents = "" + o.records[record] + "/" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
+                    break;
+                case toolTipContentTypes.fullRecord:
+                    
+                    var totalRecord = 0;
+                    if (o.settings.tooltipPercentages)
+                    {
+                        for (var i = 0; i < o.seriesCount;i++)                        
+                        {
+                            totalRecord += (o.values.get(i,record))*1;
+                        }
+                    }
+                    
+                    //Add the contents
+                    var contents = "<b>" + o.records[record] + "</b><br>";
+                    for (var i = 0; i < o.seriesCount;i++)
+                    {
+                        contents += fixLength((o.series[i] + ":"),10,'&nbsp;');
+                        contents += fixLength(o.values.get(i,record),3,'&nbsp;');
+                        
+                        if (o.settings.tooltipPercentages)
+                        {
+                            contents += "(" + Math.floor((100/totalRecord)*o.values.get(i,record)) + "%)";                            
+                        }
+                        contents += "<br>";
+                    }
+                    break;
+                case toolTipContentTypes.fullSeries:
+                    
+                    var totalSeries= 0;
+                    
+                    if (o.settings.tooltipPercentages)
+                    {
+                        for (var i = 0; i < o.recordCount;i++)                        
+                        {
+                            totalSeries += (o.values.get(series,i))*1;
+                        }
+                    }
+                    
+                    //Add the contents
+                    var contents = "<b>" + o.series[series] + "</b><br>";
+                    for (var i = 0; i < o.recordCount;i++)
+                    {
+                        contents += fixLength((o.records[i] + ":"),10,'&nbsp;');
+                        contents += fixLength(o.values.get(series,i),3,'&nbsp;');
+                        
+                        if (o.settings.tooltipPercentages)
+                        {
+                            contents += "(" + Math.floor((100/totalSeries)*o.values.get(series,i)) + "%)";                            
+                        }
+                        contents += "<br>";
+                    }   
+                    
+                    break;
+                default:
+                    //same as "record"
+                    contents = "" + o.records[record] + "/" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
+                    break;
+            }
+            
                     
             tooltip('tooltip' + o.settings.randomNumber, 'tooltip' + o.settings.randomNumber,y,x,contents)
             
@@ -540,6 +603,12 @@ function array2d()
      right: 3     
  });
 
+ var toolTipContentTypes = $.extend(
+ {
+     record: 1,
+     fullRecord: 2,
+     fullSeries: 3     
+ });
 
 
 
@@ -609,35 +678,65 @@ function barObject(settings, i, p1, p2, id)
 }
 
 //Line object template
-function lineObject(settings, i, p1, p2)
+function lineObject(settings, i, p1, p2, id)
 {
     var o = {};
     o.p1 = p1;
     o.p2 = p2;
     o.drawOrder = 0;
     o.draw = function()
-    {
-        drawLine(settings.ctx, settings.lineCol, settings.lineWidth, p1, p2);
+    {        
+        drawLine(settings.ctx, lineCol, settings.lineWidth, p1, p2);
     };    
     return o;
 }
 
 //Dot object template
-function dotObject(settings, i, p)
+function dotObject(settings, i, p, id)
 {
     var o = {};
     o.p1 = p;
     o.drawOrder = 1;
     o.draw = function()
     {
-        settings.ctx.beginPath();
-        settings.ctx.arc(p.x, p.y, settings.lineWidth * 1.5, 0, 2 * Math.PI, false);
         settings.ctx.fillStyle = settings.dotFill;
+        
+        if (id == settings.touchedObject)
+        {
+            clog("touching this dot");
+            settings.ctx.fillStyle = '#F00';
+        }
+        
+        
+        settings.ctx.beginPath();
+        settings.ctx.arc(p.x, p.y, settings.lineWidth * 1.5, 0, 2 * Math.PI, false);        
         settings.ctx.fill();
         settings.ctx.lineWidth = settings.lineWidth;
         settings.ctx.strokeStyle = settings.dotFill;
         settings.ctx.stroke();
-    }
+        
+        settings.ctx.fillStyle = settings.dotFill;
+    };
+    
+    
+    
+    
+    o.touching = function(y,x)
+    {
+        var y1 = p.y;
+        var x1 = p.x;
+        
+        if (near(y,y1,5) && near(x,x1,5))
+        {
+            o.touched = true;
+            return true;
+        }
+        else
+        {
+            o.touched = false;
+            return false;
+        }
+    };
     return o;
 }
 
