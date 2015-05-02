@@ -41,6 +41,9 @@
             labels: ["none","none","none"],                         // none/name/value - what to show on labels
             labelYOffset: 14,                                       // Y offset positioning of labels
             labelXOffset: 3,                                        // X offset positioning of labels
+                        
+            //Currently touched objects
+            touchedObject: -1,
             
             //Bar chart specifics            
             colours: ['#3498db', '#e67e22', '#16a085', '#34495e', '#e74c3c', '#95a5a6', '#1abc9c', '#f1c40f'],                                    
@@ -56,8 +59,8 @@
             
             //Types
             seriesTypes: [],
-            //defaultType: types.stackedBar
-            defaultType: types.bar
+            defaultType: types.stackedBar
+            //defaultType: types.bar
                         
         }, options);
 

@@ -131,20 +131,22 @@ function graph(type)
     };
 
     //Animated Draw Function
-    o.draw = function(startTime, first)
+    o.draw = function(startTime, first, animated)
     {
-
+        clog("touched is " + o.settings.touchedObject);
+        if (animated == undefined)
+        {
+            animated = true;            
+        }
+        
         if (startTime == undefined)
         {
             o.draw(now(),true);
         }
         else
         {
-            var stackLevels = [];
-        
-        
+            var stackLevels = [];                
             var barWidth = ((o.settings.width - (2 * o.settings.margin)) - (o.settings.gap * (o.recordCount + 1))) / o.recordCount; // calculate bar width based on total columns etc
-
             var ctx = o.settings.ctx;
 
             wipeCanvas("canvas" + o.settings.randomNumber);
@@ -159,8 +161,6 @@ function graph(type)
                 var x = (barWidth / 2) + (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1)));
                 canvasWrite(ctx, o.records[i], o.settings.height - o.settings.margin + 12, x, o.settings.fontSize, o.settings.font, o.settings.fontColor, hAlign.centre)
             }
-
-
 
             //Find the maximum value
             var maxVal = 0;
@@ -215,7 +215,11 @@ function graph(type)
             frac = Math.max(0, frac); // frac must not be below 0
             frac = Math.min(1, frac); // frac must not be above 1
 
-            
+            if (!animated)
+            {
+                debug(2,"drawing non-animated");
+                frac = 1;
+            }
             
             if (frac > 0)
             {
@@ -249,18 +253,13 @@ function graph(type)
                     }
                 }
                 
-                
-                                
-                //var objects = objectsCollection();
+                //Clear the current objects
+                o.objects.clear();
 
                 for (var series = 0; series < o.seriesCount; series++)
                 {
                     //previous point (0,0)
-                    var oldPoint = null;
-
-                    //Clear the current objects
-                    o.objects.clear();
-
+                    var oldPoint = null;                
                     var barCount = 0;
                     
                     //Loop through values
@@ -308,7 +307,8 @@ function graph(type)
                             var width = barWidth/totalBarCount;  //the actual width of each bar - barWidth will be used 
                             var p1 = point(o.settings.height - o.settings.margin, (barShifts[series] * width) + (o.settings.margin + ((barWidth * i)) + (o.settings.gap * (i + 1))));
                             var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (barShifts[series]* width) + (o.settings.margin + (barWidth * i)) + ((o.settings.gap * (i + 1)) + width) );
-                            var newObject = barObject(o.settings, series, p1, p2);
+                            var id = (o.recordCount*series) + i;
+                            var newObject = barObject(o.settings, series, p1, p2, id);
                             o.objects.add(newObject);
                             barCount++;
                         }
@@ -321,7 +321,8 @@ function graph(type)
                             var stackOffset = 0;    // for debugging, should be 0 in general
                             var p1 = point((o.settings.height - o.settings.margin) - stackLevels[i], (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1))) + stackCount * stackOffset );
                             var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[i], (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth + stackCount * stackOffset);
-                            var newObject = barObject(o.settings, series, p1, p2);
+                            var id = (o.recordCount*series) + i;
+                            var newObject = barObject(o.settings, series, p1, p2,id);
                             o.objects.add(newObject);
                             
                             //Stack specifics
@@ -448,7 +449,27 @@ function graph(type)
     {
         y -= o.settings.top;
         x -= o.settings.left;
-        clog("interpreting mouse at y=" + y + ", x=" + x);
+        
+        var touchingSomething = -1;
+        
+        for (var i = 0; i < o.objects.count; i++)
+        {
+            var obj = o.objects.objects[i];
+            if (obj.touching(y,x))
+            {
+                touchingSomething = i;
+                clog("touching object " + i);
+            }            
+        }
+        if (touchingSomething < 0)
+        {
+            o.settings.touchedObject = -1;
+        }
+        else
+        {
+            o.settings.touchedObject = touchingSomething;            
+        }
+        o.draw(now(),true,false);
         
     }
     return o;
@@ -523,12 +544,13 @@ function array2d()
 ///////////////////////////////////////////
 
 //Bar object template
-function barObject(settings, i, p1, p2)
+function barObject(settings, i, p1, p2, id)
 {
     var o = {};
     o.p1 = p1;
     o.p2 = p2;
     o.drawOrder = 0;
+    
     o.draw = function()
     {
         var y1 = Math.min(p1.y, p2.y);
@@ -540,25 +562,43 @@ function barObject(settings, i, p1, p2)
         y2 = y2 - y1;
         x2 = x2 - x1;
 
-        settings.ctx.fillStyle = settings.colours[i];
-        settings.ctx.strokeStyle = settings.lineCol;
+        
+        if (id == settings.touchedObject)
+        {            
+            settings.ctx.strokeStyle = '#000'
+            settings.ctx.fillStyle = '#000';
+        }
+        else
+        {            
+            settings.ctx.strokeStyle = settings.lineCol;
+            settings.ctx.fillStyle = settings.colours[i];
+        }
+        
         settings.ctx.moveTo(x1, y1);
-
         settings.ctx.fillRect(x1, y1, x2, y2);
         settings.ctx.rect(x1, y1, x2, y2);
     };
 
+    
     o.touching = function(y,x)
     {
+        var y1 = Math.min(p1.y, p2.y);
+        var y2 = Math.max(p1.y, p2.y);
+
+        var x1 = Math.min(p1.x, p2.x);
+        var x2 = Math.max(p1.x, p2.x);
+        
         if (between(y,y1,y2) && between (x,x1,x2))
         {
+            o.touched = true;
             return true;
         }
         else
         {
+            o.touched = false;
             return false;
         }
-    }
+    };
     
     return o;
 }
@@ -573,7 +613,7 @@ function lineObject(settings, i, p1, p2)
     o.draw = function()
     {
         drawLine(settings.ctx, settings.lineCol, settings.lineWidth, p1, p2);
-    }
+    };    
     return o;
 }
 
@@ -615,12 +655,14 @@ function objectsCollection()
 {
     var o = {};
     o.maxOrder = 0;
-
+    o.objects = [];
+    o.count = 0;
+    
     o.add = function(child)
     {
         o.objects[o.count] = child;
         o.count++;
-        o.maxOrder = Math.max(o.maxOrder, child.drawOrder);
+        o.maxOrder = Math.max(o.maxOrder, child.drawOrder);        
     };
     o.clear = function()
     {
@@ -638,6 +680,7 @@ function objectsCollection()
             return null;
         }
     };
+    
     o.drawAll = function()
     {
         for (var d = 0; d <= o.maxOrder; d++)
