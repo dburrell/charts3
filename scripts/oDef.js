@@ -97,6 +97,26 @@ function graph(type)
       return val;
     };
     
+    o.getTotalRecord = function(n)
+    {
+        var val = 0;
+        for (var i = 0; i < o.seriesCount; i++)        
+        {
+            val += o.get(o.records[n],o.series[i])
+        }
+        return val;
+    };
+    
+    o.getTotalSeries = function(n)
+    {
+        var val = 0;
+        for (var i = 0; i < o.recordCount; i++)        
+        {
+            val += (o.get(o.records[i],o.series[n]))*1
+        }
+        return val;
+    };
+    
     //Set a different series type
     o.setSeriesType = function(i,n)
     {
@@ -158,12 +178,10 @@ function graph(type)
 
     //Animated Draw Function
     o.draw = function(startTime, first, animated)
-    {        
-        if (animated == undefined)
-        {
-            animated = true;            
-        }
-                
+    {
+        animated = ifUnd(animated,true);        // default animated to true;
+        //startTime = ifUnd(startTime,now());     // default startTime to now();
+
         if (startTime == undefined)
         {
             o.draw(now(),true);
@@ -281,6 +299,8 @@ function graph(type)
                 //Clear the current objects
                 o.objects.clear();
 
+                var angleCumulative = 0;
+                
                 for (var series = 0; series < o.seriesCount; series++)
                 {
                     //previous point (0,0)
@@ -393,6 +413,32 @@ function graph(type)
                             o.objects.add(newObject);
                         }
 
+                        ///////////////////////////////////////////
+                        //pie chart version
+                        ///////////////////////////////////////////
+                        if (o.settings.seriesTypes[series] == types.pie)
+                        {
+                            if (series > 0)
+                            {
+                                debug(1,"Not adding pie for series " + series)
+                            }
+                            else
+                            {
+                                clog("pie!");
+                                var width = barWidth/totalBarCount;  //the actual width of each bar - barWidth will be used 
+                               
+                                var id = (o.recordCount*series) + i;                                
+                                var total = o.getTotalSeries(0);
+                                var deg = (360/total) * (val);
+                                
+                                debug(2,"total is " + total)
+                                
+                                var newObject = pieSliceObject(o.settings,angleCumulative ,angleCumulative + deg, id);
+                                angleCumulative += deg;
+                                o.objects.add(newObject);                                
+                            }
+                        }
+                        
 
                         //Push new point into old point
                         oldPoint = newPoint;
@@ -589,10 +635,8 @@ function graph(type)
                     contents = "" + o.records[record] + "/" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
                     break;
             }
-            
-                    
+              
             tooltip('tooltip' + o.settings.randomNumber, 'tooltip' + o.settings.randomNumber,y,x,contents)
-            
         }
         
         if (o.settings.touchedObject != currentlyTouching)
@@ -739,6 +783,61 @@ function barObject(settings, i, p1, p2, id)
     
     return o;
 }
+
+
+
+function pieSliceObject(settings,sAngle, eAngle,id)
+{
+    var o = {};
+    o.drawOrder = 0;
+    
+    o.draw = function()
+    {
+        var deg = eAngle - sAngle;
+        //var a = r2d(deg);
+        var a = deg;
+        debug(1,"Pie draw stub");
+        debug(1,"-> drawing id=" + id + ", deg=" + deg);
+        
+        var halfWidth = settings.width/2.5;
+        var radius = halfWidth;
+        var innerRadius = radius;
+        var x1 = halfWidth;
+        var y1 = halfWidth;
+        var x2 = (radius * Math.cos(a)) + (halfWidth);
+        var y2 = (radius * Math.sin(a)) + (halfWidth);  
+        
+        //Colouring
+        settings.ctx.beginPath();        
+        //var grd = settings.ctx.createLinearGradient(halfWidth, halfWidth, x2, y2);
+        //grd.addColorStop(0, settings.colours[0]);     
+        //grd.addColorStop(1, settings.colours[1]);                        
+        settings.ctx.fillStyle = settings.colours[0];          
+        settings.ctx.lineWidth = 1;
+        settings.ctx.strokeStyle = '#000';
+        
+        //Line drawing
+        var innerX = x1;
+        var innerY = y1;
+        settings.ctx.arc(halfWidth, halfWidth, radius, d2r(sAngle), d2r(eAngle));
+        settings.ctx.lineTo(innerX,innerY); 
+        settings.ctx.arc(halfWidth, halfWidth, innerRadius, d2r(eAngle), d2r(sAngle), true);
+        settings.ctx.closePath();
+        settings.ctx.stroke();        
+        settings.ctx.fill();
+        
+        
+        
+        
+    };
+    o.touching = function(y,x)
+    {
+        return false;
+    }
+    
+    return o;
+}
+
 
 //Line object template
 function lineObject(settings, i, p1, p2, id)

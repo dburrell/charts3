@@ -141,6 +141,19 @@ function between(a, b, c)
     }
 }
 
+//radians to degrees
+function r2d(n)
+{
+    return n/(2*Math.PI)*360;
+}
+
+//degrees to radians
+function d2r(n)
+{
+    return n/360*(2*Math.PI);
+}
+
+
 // is x near nearToAmount with a flexibility of nearToFlexibility
 function near(x, nearToAmount, nearToFlexibility)
 {
@@ -154,6 +167,15 @@ function near(x, nearToAmount, nearToFlexibility)
     }
 }
 
+//replace undefined with somthing
+function ifUnd(s,replaceWith)
+{
+    if (s == undefined)
+    {
+        s = replaceWith;
+    }
+    return s;
+}
 
 ////////////////////////////////////////////////////
 //Timing functions

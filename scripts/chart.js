@@ -67,7 +67,8 @@
             
             //Types
             seriesTypes: [],
-            defaultType: types.stackedBar
+            //defaultType: types.stackedBar
+            defaultType: types.pie
             //defaultType: types.bar
                         
         }, options);
