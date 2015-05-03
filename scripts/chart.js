@@ -8,8 +8,9 @@
         //parameters
         /////////////////////////
         var settings = $.extend(
-        {
+        {            
             //General                            
+            newObject: true,
             randomNumber: Math.round(Math.random() * 100),          // Random number for the chart ID
             ctx: null,                                              // Context
             cols: -1,                                               // Number of columns per series            
@@ -32,6 +33,7 @@
             width: 300,                                             // Width of canvas
             height: 300,                                            // Height of canvas
             margin: 40,                                             // Margin around drawarea
+            container: 'container',                                 // parent object - leave blank to make position absolute
             
             //Axis info
             borderCol: "#aaa",                                      // For the axis borders                        
@@ -73,7 +75,7 @@
             //Types
             seriesTypes: [],
             //defaultType: types.stackedBar
-            defaultType: types.donut
+            defaultType: types.stackedBar
             //defaultType: types.bar
                         
         }, options);
@@ -89,18 +91,20 @@
         /////////////////////////     
         var g = graph();            // make an object
         g.convertTable(this);       // import data
+        g.settings = settings;
         
         //Default the seriesTypes to bar
         for(var i = 0; i <= g.seriesCount; i++)
         {        
-            settings.seriesTypes[i] = settings.defaultType;
+            g.settings.seriesTypes[i] = settings.defaultType;
         } 
         
         //create canvas                
         if (settings.ctx == null)
         {
-            settings.ctx = makeCanvas("canvas" + settings.randomNumber, settings.bgCol, settings.height, settings.width, settings.position, settings.left, settings.top);
-            settings.ctx.translate(0.5, 0.5);
+            //settings.ctx = makeCanvas("canvas" + settings.randomNumber, settings.bgCol, settings.height, settings.width, settings.position, settings.left, settings.top, settings.container);
+            //g.init();
+            
             $("#" + "canvas" + settings.randomNumber).hide();
             
             //On mouse over of this canvas, 
@@ -112,8 +116,9 @@
             });
         }
                 
+        g.settings.newObject = false;                
         //Pass values into graph object
-        g.settings = settings;
+        //g.settings = settings;
                 
         //Return the object
         return g;    
@@ -159,9 +164,28 @@ function canvasWrite(ctx, txt, y, x, fontSize, font, color, align)
 
 
 
-function makeCanvas(id, bgCol, height, width, position, left, top)
+function makeCanvas(id, bgCol, height, width, position, left, top, container)
 {
-    $("body").append("<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>");
+    
+    clog("id is " + id)
+    clog("container is " + container)
+    
+    
+    
+    if (container == undefined )
+    {
+        container = "body";
+    }
+    else
+    {
+        container = "#" + container;
+        position = "";
+    }
+    
+    var toAppend = "<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>";
+    
+    $(container).append(toAppend);
+    //$(container).append("<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>");
     var ctx = getContext(id);
     ctx.clearRect(0, 0, width, height);
     //drawBox(ctx, "transparent", bgCol, point(0, 0), point(height, width));

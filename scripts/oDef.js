@@ -20,6 +20,41 @@ function graph(type)
 
     o.objects = objectsCollection();
     
+    
+    o.init = function()
+    {
+        o.settings.ctx = makeCanvas("canvas" + o.settings.randomNumber, o.settings.bgCol, o.settings.height, o.settings.width, o.settings.position, o.settings.left, o.settings.top, o.settings.container);
+        o.settings.ctx.translate(0.5, 0.5);
+        
+        clog("settings mouseOver fo #canvas" + o.settings.randomNumber);
+        //On mouse over of this canvas, 
+        $( "#canvas" + o.settings.randomNumber).mousemove(function( event )
+        {            
+            var y = event.pageY;
+            var x = event.pageX;
+            o.mouseOver(y,x);                
+        });
+        
+        $( "#canvas" + o.settings.randomNumber).mouseleave(function( event )
+        {            
+            o.mouseExit();
+            
+        });
+        
+    };
+    
+    
+    // Safely destory
+    o.destroy = function()
+    {
+        clog("removing #canvas" + o.settings.randomNumber)
+      $("#canvas" + o.settings.randomNumber).hide();
+      $("#canvas" + o.settings.randomNumber).remove();
+    };
+    
+    
+    
+    
     //Add a series holder with name
     o.addSeries = function(s)
     {
@@ -214,64 +249,78 @@ function graph(type)
 
             wipeCanvas("canvas" + o.settings.randomNumber);
 
-            //Add the borders 
-            drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.height - o.settings.margin, o.settings.width - o.settings.margin));
-            drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.margin, o.settings.margin));
-
-            //Add the x axis values (record values)
-            for (var i = 0; i < o.recordCount; i++)
+            
+            if (o.settings.seriesTypes[0] == types.bar
+                || o.settings.seriesTypes[0] == types.stackedBar
+                || o.settings.seriesTypes[0] == types.line
+                || o.settings.seriesTypes[0] == types.scatter)
             {
-                var x = (barWidth / 2) + (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1)));
-                canvasWrite(ctx, o.records[i], o.settings.height - o.settings.margin + 12, x, o.settings.fontSize, o.settings.font, o.settings.fontColor, hAlign.centre)
-            }
-
-            //Find the maximum value
-            var maxVal = 0;
-            var minVal = 0;
-            var maxStack = 0;
-            for (var r = 0; r < o.recordCount; r++)            
-            {                
-                var val = 0;
-                var stackVal = 0;
-                for (var s = 0; s < o.seriesCount; s++)
-                {
-                    val = Math.max(Number(o.get(o.records[r], o.series[s])), val);  // either taking highest rolling
-                    var valToStack = Number(o.get(o.records[r], o.series[s]));      // or for stacking, add the current
-                    
-                    if (o.settings.seriesTypes[s] == types.stackedBar)
-                    {
-                        stackVal += valToStack;                        
-                    }
-                }
-   
-                if (val > maxVal)
-                {
-                    maxVal = val;
-                }
-                if (val < minVal)
-                {
-                    minVal = val                
-                }
+                //Assumption is that we won't have combined incompatible types (a bar and a pie etc) so if first requires chartArea then go for it
+            
                 
-                maxStack = Math.max(maxStack,stackVal);            
-            }
-
-            maxVal = Math.max(maxStack,maxVal);
+                //Add the borders 
+                drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.height - o.settings.margin, o.settings.width - o.settings.margin));
+                drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.margin, o.settings.margin));
+    
+                //Add the x axis values (record values)
+                for (var i = 0; i < o.recordCount; i++)
+                {
+                    var x = (barWidth / 2) + (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1)));
+                    canvasWrite(ctx, o.records[i], o.settings.height - o.settings.margin + 12, x, o.settings.fontSize, o.settings.font, o.settings.fontColor, hAlign.centre)
+                }
             
-            //Find pixels per value (i.e. ratio)
-            var valRatio = (o.settings.height - (2 * o.settings.margin)) / maxVal;
+            
+                
+                
+                //Find the maximum value
+                var maxVal = 0;
+                var minVal = 0;
+                var maxStack = 0;
+                for (var r = 0; r < o.recordCount; r++)            
+                {                
+                    var val = 0;
+                    var stackVal = 0;
+                    for (var s = 0; s < o.seriesCount; s++)
+                    {
+                        val = Math.max(Number(o.get(o.records[r], o.series[s])), val);  // either taking highest rolling
+                        var valToStack = Number(o.get(o.records[r], o.series[s]));      // or for stacking, add the current
+                        
+                        if (o.settings.seriesTypes[s] == types.stackedBar)
+                        {
+                            stackVal += valToStack;                        
+                        }
+                    }
+       
+                    if (val > maxVal)
+                    {
+                        maxVal = val;
+                    }
+                    if (val < minVal)
+                    {
+                        minVal = val                
+                    }
+                    
+                    maxStack = Math.max(maxStack,stackVal);            
+                }
+    
+                maxVal = Math.max(maxStack,maxVal);
+                
+                //Find pixels per value (i.e. ratio)
+                var valRatio = (o.settings.height - (2 * o.settings.margin)) / maxVal;
+    
+                
+    
+                //Add the y axis values (just the bar and numbers)
+                var yVals = (maxVal - minVal) / o.settings.yScale;
+                for (var i = minVal; i <= yVals; i++)
+                {
+                    var val = minVal + (o.settings.yScale * i);
+                    var y = ((o.settings.height - o.settings.margin) - (o.settings.height - o.settings.margin * 2) / yVals * i) + o.settings.fontSize / 2;
+                    canvasWrite(ctx, val, y, o.settings.margin - 3, o.settings.fontSize - 1, o.settings.font, o.settings.fontColor,hAlign.right)
+                }
 
             
-
-            //Add the y axis values (just the bar and numbers)
-            var yVals = (maxVal - minVal) / o.settings.yScale;
-            for (var i = minVal; i <= yVals; i++)
-            {
-                var val = minVal + (o.settings.yScale * i);
-                var y = ((o.settings.height - o.settings.margin) - (o.settings.height - o.settings.margin * 2) / yVals * i) + o.settings.fontSize / 2;
-                canvasWrite(ctx, val, y, o.settings.margin - 3, o.settings.fontSize - 1, o.settings.font, o.settings.fontColor,hAlign.right)
             }
-
             o.settings.fadeTime = 0;
             
             //Calculate the timing fraction
@@ -332,8 +381,6 @@ function graph(type)
                     var barCount = 0;
                     
                     
-                    
-                    
                     //Loop through values
                     for (var record = 0; record < o.recordCount; record++)
                     {
@@ -385,6 +432,7 @@ function graph(type)
                             var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (barShifts[series]* width) + (o.settings.margin + (barWidth * record)) + ((o.settings.gap * (record + 1)) + width) );
                             var id = (o.recordCount*series) + record;
                             var newObject = barObject(o.settings, series, p1, p2, id, series, record);
+                            
                             o.objects.add(newObject);
                             barCount++;
                         }
@@ -395,14 +443,14 @@ function graph(type)
                         if (o.settings.seriesTypes[series] == types.stackedBar)
                         {
                             var stackOffset = 0;    // for debugging, should be 0 in general
-                            var p1 = point((o.settings.height - o.settings.margin) - stackLevels[i], (o.settings.margin + (barWidth * record) + (o.settings.gap * (record + 1))) + stackCount * stackOffset );
-                            var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[i], (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth + stackCount * stackOffset);
+                            var p1 = point((o.settings.height - o.settings.margin) - stackLevels[record], (o.settings.margin + (barWidth * record) + (o.settings.gap * (record + 1))) + stackCount * stackOffset );
+                            var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[record], (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth + stackCount * stackOffset);
                             var id = (o.recordCount*series) + record;
-                            var newObject = barObject(o.settings, series, p1, p2,id, series, record);
+                            var newObject = barObject(o.settings, series, p1, p2, id, series, record);
                             o.objects.add(newObject);
                             
                             //Stack specifics
-                            stackLevels[i] += (val * valRatio);         // The next stacked bar in this record will start from here
+                            stackLevels[record] += (val * valRatio);         // The next stacked bar in this record will start from here
                             stackCount++;                               // The next stacked bar will shift over by 1
                             if (stackCount == 0)
                             {
@@ -568,9 +616,15 @@ function graph(type)
     //Mouse over the graph object
     o.mouseOver = function(y,x)
     {
-        y -= o.settings.top;
-        x -= o.settings.left;
+        //y -= o.settings.top;
+        //x -= o.settings.left;
+        var obj = $("#canvas" + o.settings.randomNumber)        
+        y -= obj.offset().top;
+        x -= obj.offset().left;
         
+        var trueY = y + obj.offset().top;
+        var trueX = x + obj.offset().left;
+        clog("position: " + x + "," + y)
         var currentlyTouching = o.settings.touchedObject;        
         var touchingSomething = -1;
         
@@ -685,13 +739,19 @@ function graph(type)
                     break;
             }
               
-            tooltip('tooltip' + o.settings.randomNumber, 'tooltip' + o.settings.randomNumber,y,x,contents)
+            tooltip('tooltip' + o.settings.randomNumber, 'tooltip' + o.settings.randomNumber,trueY,trueX,contents)
         }
         
         if (o.settings.touchedObject != currentlyTouching)
         {
             o.draw(now(),true,false);
         }
+    }
+    
+    
+    o.mouseExit = function()
+    {
+        $('#tooltip' + o.settings.randomNumber).remove();
     }
     return o;
 }
@@ -869,11 +929,9 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar, series, reco
         var series = Math.floor(id/g.recordCount);
         var record = id - (series*g.recordCount);
         if (donut)
-        {                        
-            clog("calcing series " + series + " for id " + id);            
+        {                                    
             innerRadius = (record * Math.floor(totalRadius /g.recordCount));
-            radius = ((record + 1) * Math.floor(totalRadius /g.recordCount)) - settings.donutGap;
-            clog("id=" + id + ", series=" + series + ", record=" + record + ", innerRadius=" + innerRadius + ", outer=" + radius)
+            radius = ((record + 1) * Math.floor(totalRadius /g.recordCount)) - settings.donutGap;            
         }
         if (polar)
         {
@@ -901,6 +959,15 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar, series, reco
         settings.ctx.lineWidth = 3;
         settings.ctx.strokeStyle = '#EAEAEA';
         
+         if (id == settings.touchedObject)
+        {                        
+            settings.ctx.globalAlpha=0.4;
+        }
+        else
+        {            
+            settings.ctx.globalAlpha=1;
+        }
+        
         //Drawing
         var innerX = (innerRadius * Math.cos(d2r(eAngle))) + x1;
         var innerY = (innerRadius * Math.sin(d2r(eAngle))) + y1;               
@@ -912,7 +979,8 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar, series, reco
         settings.ctx.arc(x1, y1, innerRadius, d2r(eAngle), d2r(sAngle), true);
         settings.ctx.closePath();
         settings.ctx.stroke();        
-        settings.ctx.fill();                            
+        settings.ctx.fill();
+        settings.ctx.globalAlpha=1;
     };
     o.touching = function(y,x)
     {
