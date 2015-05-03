@@ -14,26 +14,31 @@
 <br>
 
 <!--table with data in to fill the graph-->
+Weekly spending data
 <table id="dataTable">
     <tr>
         <td></td>
-        <td><center>Maths</center></td>
-        <td><center>History</center></td>
+        <td><center>Groceries</center></td>
+        <td><center>Travel</center></td>
+        <td><center>Entertainment</center></td>
     </tr>
     <tr>
         <td>Alice</td>
-        <td><center>70</center></td>
-        <td><center>90</center></td>
+        <td><center>$10.00</center></td>
+        <td><center>$20.00</center></td>
+        <td><center>$30.00</center></td>
     </tr>
     <tr>
         <td>Bob</td>
-        <td><center>22</center></td>
-        <td><center>40</center></td>
+        <td><center>$40.00</center></td>
+        <td><center>$50.00</center></td>
+        <td><center>$60.00</center></td>
     </tr>
     <tr>
         <td>Charlie</td>
-        <td><center>75</center></td>
-        <td><center>33</center></td>
+        <td><center>$70.00</center></td>
+        <td><center>$80.00</center></td>
+        <td><center>$90.00</center></td> 
     </tr>
 </table>
 <script>
@@ -44,7 +49,7 @@
     //g.addRecord("Alice",[90,70]);
     //g.convertTable("#dataTable");
     var g = $("#dataTable").jChart(width=800);
-    g.settings.seriesTypes[1] = types.scatter;
+    //g.settings.seriesTypes[1] = types.scatter;
     g.draw();
     
 </script>

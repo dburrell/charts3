@@ -35,8 +35,12 @@
             
             //Axis info
             borderCol: "#aaa",                                      // For the axis borders                        
-            yScale: 10,                                              // incremental values on y axis
+            yScale: 10,                                             // incremental values on y axis
                         
+            //Currency
+            possibleCurrencies: ['$','£','€'],                      // possible currency leading symbols
+            currency: '',                                           // taken from any leading symbols in the data
+            
             //Labels
             labels: ["none","none","none"],                         // none/name/value - what to show on labels
             labelYOffset: 14,                                       // Y offset positioning of labels
@@ -46,7 +50,7 @@
             touchedObject: -1,
             
             //Tooltip settings
-            tooltipContents:toolTipContentTypes.fullSeries,
+            tooltipContents:toolTipContentTypes.fullRecord,
             tooltipPercentages: true,
             
             //Bar chart specifics            
@@ -54,7 +58,7 @@
             gap: 10,
             
             //Line chart specifics            
-            lineWidth: 2,                                            // line width
+            lineWidth: 2,                                           // line width
             dots: true,
             shadeUnderLine: true,
                            

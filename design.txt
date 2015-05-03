@@ -26,3 +26,13 @@ Stacked columns will be listed next to each other, so for example:
   Bills(stacked)
   
 Would not work, because the stacked Bills column will not start above the end of rent
+
+
+=========================
+FAQ
+=========================
+
+Q: Why not have it animate on data change? (e.g. animated resizing of bar after value change)
+A: I can't think of any realistic use-cases that the source data would change without a page refresh anyway. On the occasions this is required, a fadeout/in doesn't lose too much value.
+    - If this does become required, the graph animation already exists, so it would involve setting the 0 state to the previous values and going from there (should be included in calculation of fracVal).
+    - Would we then want to animate addition/removal of records/series as well? 

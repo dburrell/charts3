@@ -38,8 +38,8 @@ function graph(type)
         if (typeof vals !== "undefined")
         {
             for (var i = 0; i < vals.length; i++)
-            {
-                o.values.set(i, o.recordCount - 1, vals[i]);
+            {                
+                o.set(o.records[o.recordCount-1], o.series[i],vals[i]);             
             }
         }
     };
@@ -65,10 +65,17 @@ function graph(type)
     o.set = function(recordKey, seriesKey, val)
     {
         try
-        {
-            var y = o.recordNames[recordKey];
+        {            
+            var y = o.recordNames[recordKey];         
             var x = o.seriesNames[seriesKey];
-            o.values.set(x, y, val);
+            
+            for (var i = 0; i < o.possibleCurrencies; i++)            
+            {
+                val = o.blankAndSetCurrency(val,o.possibleCurrencies[i]);    
+            }
+            val = val.replace("$","")
+            
+            o.values.set(x, y, val);           
             return true;
         }
         catch (e)
@@ -78,6 +85,18 @@ function graph(type)
         }
     }
 
+    o.blankAndSetCurrency = function(val,cur)
+    {    
+      if (val.indexOf(cur) >= 0)
+      {
+        o.currency = cur
+        val = val.replace(cur,"");
+        val = val * 1        
+      }
+        
+      return val;
+    };
+    
     //Set a different series type
     o.setSeriesType = function(i,n)
     {
@@ -87,6 +106,7 @@ function graph(type)
     //Import data from a table
     o.convertTable = function(tableSearchString)
     {
+        debug(3,"Converting table")
         var table = $(tableSearchString);
 
         table.find('tr').each(function(y)
@@ -114,20 +134,26 @@ function graph(type)
                 }
             });
 
+            
             if (y == 0)
             {
                 //Add the series collection
+                debug(3,"-> Adding series headers")
                 for (var i = 1; i < vals.length; i++)
                 {
+                    debug(3,"--> Adding Series " + vals[i])
                     o.addSeries(vals[i]);
                 }
+                debug(3,"--> Completed.")
             }
             else
             {
                 //Add a new record
+                debug(3,"-> adding record " + record)
                 o.addRecord(record, vals);
             }
         });
+        debug(3,"-> All records added.")
     };
 
     //Animated Draw Function
@@ -137,7 +163,7 @@ function graph(type)
         {
             animated = true;            
         }
-        
+                
         if (startTime == undefined)
         {
             o.draw(now(),true);
@@ -165,20 +191,21 @@ function graph(type)
             var maxVal = 0;
             var minVal = 0;
             var maxStack = 0;
-            for (var r = 0; r < o.recordCount; r++)
-            {
+            for (var r = 0; r < o.recordCount; r++)            
+            {                
                 var val = 0;
                 var stackVal = 0;
                 for (var s = 0; s < o.seriesCount; s++)
                 {
-                    val = Math.max(Number(o.get(o.records[r], o.series[s])), val);
+                    val = Math.max(Number(o.get(o.records[r], o.series[s])), val);  // either taking highest rolling
+                    var valToStack = Number(o.get(o.records[r], o.series[s]));      // or for stacking, add the current
+                    
                     if (o.settings.seriesTypes[s] == types.stackedBar)
                     {
-                        stackVal += val;
+                        stackVal += valToStack;                        
                     }
                 }
-
-                
+   
                 if (val > maxVal)
                 {
                     maxVal = val;
@@ -188,7 +215,7 @@ function graph(type)
                     minVal = val                
                 }
                 
-                maxStack = Math.max(maxStack,stackVal);
+                maxStack = Math.max(maxStack,stackVal);            
             }
 
             maxVal = Math.max(maxStack,maxVal);
@@ -196,6 +223,7 @@ function graph(type)
             //Find pixels per value (i.e. ratio)
             var valRatio = (o.settings.height - (2 * o.settings.margin)) / maxVal;
 
+            
 
             //Add the y axis values (just the bar and numbers)
             var yVals = (maxVal - minVal) / o.settings.yScale;
@@ -214,11 +242,10 @@ function graph(type)
             frac = Math.max(0, frac); // frac must not be below 0
             frac = Math.min(1, frac); // frac must not be above 1
 
-            if (!animated)
-            {                
-                frac = 1;
-            }
-            
+                        
+                        
+                        
+                        
             if (frac > 0)
             {
                 //Init stack levels - these will increase as stacked bars are added
@@ -233,7 +260,7 @@ function graph(type)
                 var totalBarCount = 0;
                 var totalBarsWide = 0;
                 
-                //Calcualte individual bar widths
+                //Calculate individual bar widths
                 var barShifts = [];
                 var stackCounted = 0
                 for (var series = 0; series < o.seriesCount; series++)
@@ -267,6 +294,10 @@ function graph(type)
                         
                         var originalval = o.get(o.records[i], o.series[series]);
                         val = originalval * frac;
+                        if (!animated)
+                        {
+                            val = originalval;
+                        }
 
 
                         ///////////////////////////////////////////
@@ -378,15 +409,13 @@ function graph(type)
             {
                 //clog("testing first == true")
                 if (first == true)
-                {
-                    //clog("first is true")
+                {                    
                     $("#" + "canvas" + o.settings.randomNumber).fadeIn(o.settings.fadeTime);
-                    //clog("showing");
                     setTimeout(function()
                     {
                         requestAnimationFrame(function()
-                        {
-                            o.draw(startTime, false)
+                        {                            
+                            o.draw(startTime, false,animated)
                         });
                     }, o.settings.fadeTime)
                 }
@@ -394,7 +423,10 @@ function graph(type)
                 {
                     requestAnimationFrame(function()
                     {
-                        o.draw(startTime, false)
+                        if (animated)
+                        {
+                            o.draw(startTime, false)
+                        }                        
                     });
                 }
 
@@ -447,6 +479,7 @@ function graph(type)
         y -= o.settings.top;
         x -= o.settings.left;
         
+        var currentlyTouching = o.settings.touchedObject;        
         var touchingSomething = -1;
         
         for (var i = 0; i < o.objects.count; i++)
@@ -487,16 +520,31 @@ function graph(type)
                     }
                     
                     //Add the contents
-                    var contents = "<b>" + o.records[record] + "</b><br>";
+                    var contents = "<b><u>" + o.records[record] + "</u></b><br>";
+                    
+                    var maxSeriesLength = 0;
                     for (var i = 0; i < o.seriesCount;i++)
                     {
-                        contents += fixLength((o.series[i] + ":"),10,'&nbsp;');
+                        maxSeriesLength = Math.max(maxSeriesLength,o.series[i].length)
+                    }
+                    for (var i = 0; i < o.seriesCount;i++)
+                    {
+                        if (i == series)
+                        {
+                            contents += "&gt; ";
+                        }
+                        else
+                        {
+                            contents += "&nbsp; ";
+                        }
+                        contents += fixLength((o.series[i] + ":"),maxSeriesLength + 2,'&nbsp;');
                         contents += fixLength(o.values.get(i,record),3,'&nbsp;');
                         
                         if (o.settings.tooltipPercentages)
                         {
                             contents += "(" + Math.floor((100/totalRecord)*o.values.get(i,record)) + "%)";                            
                         }
+                        
                         contents += "<br>";
                     }
                     break;
@@ -516,6 +564,14 @@ function graph(type)
                     var contents = "<b>" + o.series[series] + "</b><br>";
                     for (var i = 0; i < o.recordCount;i++)
                     {
+                        if (i == record)
+                        {
+                            contents += "&gt; ";
+                        }
+                        else
+                        {
+                            contents += "&nbsp; ";
+                        }
                         contents += fixLength((o.records[i] + ":"),10,'&nbsp;');
                         contents += fixLength(o.values.get(series,i),3,'&nbsp;');
                         
@@ -523,6 +579,7 @@ function graph(type)
                         {
                             contents += "(" + Math.floor((100/totalSeries)*o.values.get(series,i)) + "%)";                            
                         }
+                        
                         contents += "<br>";
                     }   
                     
@@ -537,8 +594,11 @@ function graph(type)
             tooltip('tooltip' + o.settings.randomNumber, 'tooltip' + o.settings.randomNumber,y,x,contents)
             
         }
-        o.draw(now(),true,false);
         
+        if (o.settings.touchedObject != currentlyTouching)
+        {
+            o.draw(now(),true,false);
+        }
     }
     return o;
 }
@@ -592,7 +652,10 @@ function array2d()
      bar: 1,
      stackedBar: 2,
      line: 3,
-     scatter: 4
+     scatter: 4,
+     pie:5,
+     donut:6,
+     polar:7
  });
 
 //Horizontal Alignment
