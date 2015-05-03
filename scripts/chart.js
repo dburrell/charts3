@@ -73,7 +73,7 @@
             //Types
             seriesTypes: [],
             //defaultType: types.stackedBar
-            defaultType: types.polar
+            defaultType: types.donut
             //defaultType: types.bar
                         
         }, options);

@@ -142,6 +142,70 @@ function between(a, b, c)
     }
 }
 
+
+//replace undefined with somthing
+function ifUnd(s,replaceWith)
+{
+    if (s == undefined)
+    {
+        s = replaceWith;
+    }
+    return s;
+}
+
+
+
+
+////////////////////////////////////////////////////
+//Trigonometry Functions
+////////////////////////////////////////////////////
+
+//Find angle based on a pair of 2d points
+function findAngle(x1,y1,x2,y2)
+{
+  //Assumes up (3oclock) is 0 - this is the same as the canvas arc method
+  var dY = y2 - y1;
+  var dX = x2 - x1;
+  
+  var y = Math.max(dY,0-dY);	//positive of y
+  var x = Math.max(dX,0-dX);	//positive of x
+  var q = (Math.PI/2);
+  var a = 0;
+  
+  if (y2 < y1 && x2 >= x1)	// 12-3 oclock
+  {
+  	a = (3*q) + Math.atan(x/y);  
+  }
+  if (y2 >= y1 && x2 >= x1)	// 3-6 oclock
+  {
+		a = Math.atan(dY/x);  
+  }
+  if (y2 >= y1 && x2 < x1)	// 6-9 oclock
+  {
+		a = q + Math.atan(x/dY);    
+  }
+  if (y2 < y1 && x2 < x1)		// 9-12 oclock
+  {
+		a = (2*q) + Math.atan(dY/dX);    
+  }
+  
+  // in this case, let's convert to degrees
+  a = a/(Math.PI*2)*360;
+  
+  return a;
+}
+
+//Find distance between a pair of 2d points
+function findLength(x1,y1,x2,y2)
+{
+  var dY = y2 - y1;
+  var dX = x2 - x1;
+  
+  var len = Math.sqrt((dY*dY) + (dX*dX))
+  
+  return len;
+}
+
 //radians to degrees
 function r2d(n)
 {
@@ -166,16 +230,6 @@ function near(x, nearToAmount, nearToFlexibility)
     {
         return false;
     }
-}
-
-//replace undefined with somthing
-function ifUnd(s,replaceWith)
-{
-    if (s == undefined)
-    {
-        s = replaceWith;
-    }
-    return s;
 }
 
 ////////////////////////////////////////////////////

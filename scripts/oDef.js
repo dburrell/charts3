@@ -335,11 +335,11 @@ function graph(type)
                     
                     
                     //Loop through values
-                    for (var i = 0; i < o.recordCount; i++)
+                    for (var record = 0; record < o.recordCount; record++)
                     {
                         offSet = o.recordCount + (o.recordCount * series);
                         
-                        var originalval = o.get(o.records[i], o.series[series]);
+                        var originalval = o.get(o.records[record], o.series[series]);
                         val = originalval * frac;
                         if (!animated)
                         {
@@ -361,11 +361,11 @@ function graph(type)
                             }
                             if (o.settings.labels[series] == "name")
                             {
-                                displayVal = o.records[i];
+                                displayVal = o.records[record];
                             }
 
                             //Where to show it
-                            var x = (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth / 2 - (o.settings.fontSize - 1) / 2;
+                            var x = (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth / 2 - (o.settings.fontSize - 1) / 2;
                             var y = (o.settings.height - o.settings.margin) - (val * valRatio);
 
                             var labelYOffset = o.settings.labelYOffset;
@@ -381,10 +381,10 @@ function graph(type)
                         if (o.settings.seriesTypes[series] == types.bar)
                         {
                             var width = barWidth/totalBarCount;  //the actual width of each bar - barWidth will be used 
-                            var p1 = point(o.settings.height - o.settings.margin, (barShifts[series] * width) + (o.settings.margin + ((barWidth * i)) + (o.settings.gap * (i + 1))));
-                            var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (barShifts[series]* width) + (o.settings.margin + (barWidth * i)) + ((o.settings.gap * (i + 1)) + width) );
-                            var id = (o.recordCount*series) + i;
-                            var newObject = barObject(o.settings, series, p1, p2, id);
+                            var p1 = point(o.settings.height - o.settings.margin, (barShifts[series] * width) + (o.settings.margin + ((barWidth * record)) + (o.settings.gap * (record + 1))));
+                            var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (barShifts[series]* width) + (o.settings.margin + (barWidth * record)) + ((o.settings.gap * (record + 1)) + width) );
+                            var id = (o.recordCount*series) + record;
+                            var newObject = barObject(o.settings, series, p1, p2, id, series, record);
                             o.objects.add(newObject);
                             barCount++;
                         }
@@ -395,10 +395,10 @@ function graph(type)
                         if (o.settings.seriesTypes[series] == types.stackedBar)
                         {
                             var stackOffset = 0;    // for debugging, should be 0 in general
-                            var p1 = point((o.settings.height - o.settings.margin) - stackLevels[i], (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1))) + stackCount * stackOffset );
-                            var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[i], (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth + stackCount * stackOffset);
-                            var id = (o.recordCount*series) + i;
-                            var newObject = barObject(o.settings, series, p1, p2,id);
+                            var p1 = point((o.settings.height - o.settings.margin) - stackLevels[i], (o.settings.margin + (barWidth * record) + (o.settings.gap * (record + 1))) + stackCount * stackOffset );
+                            var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[i], (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth + stackCount * stackOffset);
+                            var id = (o.recordCount*series) + record;
+                            var newObject = barObject(o.settings, series, p1, p2,id, series, record);
                             o.objects.add(newObject);
                             
                             //Stack specifics
@@ -416,14 +416,14 @@ function graph(type)
                         if (o.settings.seriesTypes[series] == types.line)
                         {
                             var y = (o.settings.height - o.settings.margin) - (val * valRatio);
-                            var x = (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth / 2;
+                            var x = (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth / 2;
                             var newPoint = point(y, x);
 
                             if (oldPoint == null)
                             {
                                 oldPoint = newPoint;
                             }
-                            var newObject = lineObject(o.settings, i, oldPoint, newPoint);
+                            var newObject = lineObject(o.settings, i, oldPoint, newPoint, series, record);
                             o.objects.add(newObject);
                         }
 
@@ -433,10 +433,10 @@ function graph(type)
                         if (o.settings.seriesTypes[series] == types.scatter)
                         {
                             var y = (o.settings.height - o.settings.margin) - (val * valRatio);
-                            var x = (o.settings.margin + (barWidth * i)) + (o.settings.gap * (i + 1)) + barWidth / 2;
+                            var x = (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth / 2;
                             var newPoint = point(y, x);
-                            var id = (o.recordCount*series) + i;
-                            var newObject = dotObject(o.settings, i, newPoint, id);
+                            var id = (o.recordCount*series) + record;
+                            var newObject = dotObject(o.settings, i, newPoint, id, series, record);
                             o.objects.add(newObject);
                         }
 
@@ -448,28 +448,37 @@ function graph(type)
                             ||  o.settings.seriesTypes[series] == types.polar)
                         {
                             //Only donuts can handle multiple series & records, so check that first
-                            if (i == 0 || o.settings.seriesTypes[series] == types.donut)
+                            if (record == 0 || o.settings.seriesTypes[series] == types.donut)
                             {
                                 var donut = o.settings.seriesTypes[series] == types.donut;  // is this a donut?
                                 var polar = o.settings.seriesTypes[series] == types.polar;  // is this a polar area chart?
                                 
-                                var id = (o.recordCount*series) + i;            // numeric id, as before
+                                var id = (o.recordCount*series) + record;            // numeric id, as before
                                 var deg = 0;                                    // the degrees this segment will take up
                                 
                                 if (polar)
                                 {
-                                    deg = (360/o.seriesCount) * frac;           // for polar charts, each segment has SAME degree quantity
+                                    if (!animated)
+                                    {
+                                        deg = (360/o.seriesCount) ;           // for polar charts, each segment has SAME degree quantity
+                                    }
+                                    else
+                                    {
+                                        deg = (360/o.seriesCount) * frac;           // for polar charts, each segment has SAME degree quantity
+                                    }
+                                    
+                                    
                                 }
                                 else
                                 {
-                                    deg = (360/o.getTotalRecord(i) * val);      // for pie or donut, this is a weighted fraction based on the value
+                                    deg = (360/o.getTotalRecord(record) * val);      // for pie or donut, this is a weighted fraction based on the value
                                 }
                                 
                                 // Make the object
-                                var newObject = pieSliceObject(o, i, angleC[i], angleC[i] + deg, id, val, donut, polar);
+                                var newObject = pieSliceObject(o, record, angleC[record], angleC[record] + deg, id, val, donut, polar, series, record);
                                 
                                 // Add to cumulative degree for the record (REMEMBER: one circle is one record, one SEGMENT is a series in a record)
-                                angleC[i] += deg;
+                                angleC[record] += deg;
                                 
                                 // Add to the object list
                                 o.objects.add(newObject);                                
@@ -581,8 +590,11 @@ function graph(type)
         else
         {
             o.settings.touchedObject = touchingSomething;
-            var series = Math.floor(touchingSomething/o.recordCount);
-            var record = touchingSomething - (series * o.recordCount);
+            //var series = Math.floor(touchingSomething/o.recordCount);
+            //var record = touchingSomething - (series * o.recordCount);
+                    
+            var series = o.objects.objects[touchingSomething].series;
+            var record = o.objects.objects[touchingSomething].record;
                     
             var contents = "";
             
@@ -762,12 +774,14 @@ function array2d()
 ///////////////////////////////////////////
 
 //Bar object template
-function barObject(settings, i, p1, p2, id)
+function barObject(settings, i, p1, p2, id, series, record)
 {
     var o = {};
     o.p1 = p1;
     o.p2 = p2;
     o.drawOrder = 0;
+    o.series = series;
+    o.record = record;
     
     o.draw = function()
     {
@@ -823,7 +837,7 @@ function barObject(settings, i, p1, p2, id)
 
 
 
-function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar)
+function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar, series, record)
 {
     var settings = g.settings;
     donut = ifUnd(donut,false);     // by default, NOT a donut
@@ -831,6 +845,15 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar)
     
     var o = {};
     o.drawOrder = 0;
+    o.innerRadius = 0;
+    o.outerRadius = 0;
+    o.startAngle = 0;
+    o.endAngle = 0;
+    o.centreX = 0;
+    o.centreY = 0;
+    o.touched = false;
+    o.series = series;
+    o.record = record;
     
     o.draw = function()
     {
@@ -847,8 +870,7 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar)
         var record = id - (series*g.recordCount);
         if (donut)
         {                        
-            clog("calcing series " + series + " for id " + id);
-            
+            clog("calcing series " + series + " for id " + id);            
             innerRadius = (record * Math.floor(totalRadius /g.recordCount));
             radius = ((record + 1) * Math.floor(totalRadius /g.recordCount)) - settings.donutGap;
             clog("id=" + id + ", series=" + series + ", record=" + record + ", innerRadius=" + innerRadius + ", outer=" + radius)
@@ -859,10 +881,20 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar)
             radius = totalRadius / g.getMaxRecord(record) * val;
         }
         
+        
         var x1 = settings.width/2;                  // Centre X
         var y1 = settings.height/2;                 // Centre Y
         var x2 = (radius * Math.cos(a)) + (x1);     // Finishing X
         var y2 = (radius * Math.sin(a)) + (y1);     // Finishing Y
+       
+       
+        //Track everything for later
+        o.centreX = x1;
+        o.centreY = y1;
+        o.startAngle = sAngle;
+        o.endAngle = eAngle;
+        o.innerRadius = innerRadius;
+        o.outerRadius = radius;
         
         //Aesthetics        
         settings.ctx.fillStyle = settings.colours[series] ;
@@ -884,6 +916,21 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar)
     };
     o.touching = function(y,x)
     {
+        var len = findLength(o.centreX,o.centreY,x,y);
+        var angle = findAngle(o.centreX,o.centreY,x,y);
+        
+        if (between(len,o.innerRadius,o.outerRadius) && between(angle,o.startAngle,o.endAngle))
+        {            
+            o.touched = true;            
+            return true;
+        }
+        else
+        {
+            //clog("o.y1: " + o.centreY + ", o.x1: " + o.centreX + ", len: " + len + ", angle: " + angle);
+            o.touched = false;
+            return false;
+        }
+        
         return false;
     }
     
@@ -892,12 +939,15 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar)
 
 
 //Line object template
-function lineObject(settings, i, p1, p2, id)
+function lineObject(settings, i, p1, p2, id, series, record)
 {
     var o = {};
     o.p1 = p1;
     o.p2 = p2;
     o.drawOrder = 0;
+    o.series = series;
+    o.record = record;
+    
     o.draw = function()
     {        
         drawLine(settings.ctx, lineCol, settings.lineWidth, p1, p2);
@@ -906,11 +956,14 @@ function lineObject(settings, i, p1, p2, id)
 }
 
 //Dot object template
-function dotObject(settings, i, p, id)
+function dotObject(settings, i, p, id, series, record)
 {
     var o = {};
     o.p1 = p;
     o.drawOrder = 1;
+    o.series = series;
+    o.record = record;
+    
     o.draw = function()
     {
         settings.ctx.fillStyle = settings.dotFill;
@@ -1018,5 +1071,14 @@ function objectsCollection()
 
 
     o.clear();
+    return o;
+}
+
+
+function seriesRecord(series, record)
+{
+    var o = {};
+    o.series = series;
+    o.record = record;
     return o;
 }
