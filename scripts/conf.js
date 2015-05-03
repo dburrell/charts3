@@ -2,9 +2,10 @@
 ////////////////////////////////////////////////////
 //Settings
 ////////////////////////////////////////////////////
-var settings = {};
-settings.production = false;
-settings.debugLevel = 4;
+var env = {};
+env.production = false;
+env.debugLevel = 4;
+env.debugLabel = '';
 //debug levels:
 // 0 = NO DEBUG                 (production)
 // 1 = one-off information      (e.g. "before/after problem appears" or "x is 5")

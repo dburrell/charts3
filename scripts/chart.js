@@ -65,13 +65,23 @@
             //Scatter graph specifics           
             dotFill: '#eaeaea',
             
+            //Pie specifics
+            
+            //Donut specifics
+            donutGap: 5,
+            
             //Types
             seriesTypes: [],
             //defaultType: types.stackedBar
-            defaultType: types.pie
+            defaultType: types.polar
             //defaultType: types.bar
                         
         }, options);
+
+
+
+
+
 
 
         /////////////////////////
@@ -90,6 +100,7 @@
         if (settings.ctx == null)
         {
             settings.ctx = makeCanvas("canvas" + settings.randomNumber, settings.bgCol, settings.height, settings.width, settings.position, settings.left, settings.top);
+            settings.ctx.translate(0.5, 0.5);
             $("#" + "canvas" + settings.randomNumber).hide();
             
             //On mouse over of this canvas, 

@@ -102,10 +102,20 @@ function graph(type)
         var val = 0;
         for (var i = 0; i < o.seriesCount; i++)        
         {
-            val += o.get(o.records[n],o.series[i])
+            val += (o.get(o.records[n],o.series[i]))*1
         }
         return val;
     };
+    
+    o.getMaxRecord = function(n)
+    {
+        var val = 0;
+        for (var i = 0; i < o.seriesCount; i++)        
+        {
+            val = Math.max(val,(o.get(o.records[n],o.series[i]))*1)
+        }
+        return val;
+    }
     
     o.getTotalSeries = function(n)
     {
@@ -113,6 +123,16 @@ function graph(type)
         for (var i = 0; i < o.recordCount; i++)        
         {
             val += (o.get(o.records[i],o.series[n]))*1
+        }
+        return val;
+    };
+    
+    o.getMaxSeries = function(n)
+    {
+        var val = 0;
+        for (var i = 0; i < o.recordCount; i++)        
+        {
+            val = Math.max(val,(o.get(o.records[i],o.series[n]))*1);
         }
         return val;
     };
@@ -299,13 +319,20 @@ function graph(type)
                 //Clear the current objects
                 o.objects.clear();
 
-                var angleCumulative = 0;
+                var angleC = [];    
+                for (var i = 0; i < o.recordCount; i++)
+                {
+                    angleC[i] = 0;
+                }
                 
                 for (var series = 0; series < o.seriesCount; series++)
                 {
                     //previous point (0,0)
                     var oldPoint = null;                
                     var barCount = 0;
+                    
+                    
+                    
                     
                     //Loop through values
                     for (var i = 0; i < o.recordCount; i++)
@@ -416,25 +443,35 @@ function graph(type)
                         ///////////////////////////////////////////
                         //pie chart version
                         ///////////////////////////////////////////
-                        if (o.settings.seriesTypes[series] == types.pie)
+                        if (    o.settings.seriesTypes[series] == types.pie
+                            ||  o.settings.seriesTypes[series] == types.donut
+                            ||  o.settings.seriesTypes[series] == types.polar)
                         {
-                            if (series > 0)
+                            //Only donuts can handle multiple series & records, so check that first
+                            if (i == 0 || o.settings.seriesTypes[series] == types.donut)
                             {
-                                debug(1,"Not adding pie for series " + series)
-                            }
-                            else
-                            {
-                                clog("pie!");
-                                var width = barWidth/totalBarCount;  //the actual width of each bar - barWidth will be used 
-                               
-                                var id = (o.recordCount*series) + i;                                
-                                var total = o.getTotalSeries(0);
-                                var deg = (360/total) * (val);
+                                var donut = o.settings.seriesTypes[series] == types.donut;  // is this a donut?
+                                var polar = o.settings.seriesTypes[series] == types.polar;  // is this a polar area chart?
                                 
-                                debug(2,"total is " + total)
+                                var id = (o.recordCount*series) + i;            // numeric id, as before
+                                var deg = 0;                                    // the degrees this segment will take up
                                 
-                                var newObject = pieSliceObject(o.settings,angleCumulative ,angleCumulative + deg, id);
-                                angleCumulative += deg;
+                                if (polar)
+                                {
+                                    deg = (360/o.seriesCount) * frac;           // for polar charts, each segment has SAME degree quantity
+                                }
+                                else
+                                {
+                                    deg = (360/o.getTotalRecord(i) * val);      // for pie or donut, this is a weighted fraction based on the value
+                                }
+                                
+                                // Make the object
+                                var newObject = pieSliceObject(o, i, angleC[i], angleC[i] + deg, id, val, donut, polar);
+                                
+                                // Add to cumulative degree for the record (REMEMBER: one circle is one record, one SEGMENT is a series in a record)
+                                angleC[i] += deg;
+                                
+                                // Add to the object list
                                 o.objects.add(newObject);                                
                             }
                         }
@@ -786,8 +823,12 @@ function barObject(settings, i, p1, p2, id)
 
 
 
-function pieSliceObject(settings,sAngle, eAngle,id)
+function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar)
 {
+    var settings = g.settings;
+    donut = ifUnd(donut,false);     // by default, NOT a donut
+    polar= ifUnd(polar,false);      // by default, NOT a polar area chart
+    
     var o = {};
     o.drawOrder = 0;
     
@@ -796,39 +837,50 @@ function pieSliceObject(settings,sAngle, eAngle,id)
         var deg = eAngle - sAngle;
         //var a = r2d(deg);
         var a = deg;
-        debug(1,"Pie draw stub");
-        debug(1,"-> drawing id=" + id + ", deg=" + deg);
         
-        var halfWidth = settings.width/2.5;
-        var radius = halfWidth;
-        var innerRadius = radius;
-        var x1 = halfWidth;
-        var y1 = halfWidth;
-        var x2 = (radius * Math.cos(a)) + (halfWidth);
-        var y2 = (radius * Math.sin(a)) + (halfWidth);  
+        var totalRadius = settings.width/4;
+        var radius = totalRadius;
         
-        //Colouring
+        var innerRadius = 0;
+        
+        var series = Math.floor(id/g.recordCount);
+        var record = id - (series*g.recordCount);
+        if (donut)
+        {                        
+            clog("calcing series " + series + " for id " + id);
+            
+            innerRadius = (record * Math.floor(totalRadius /g.recordCount));
+            radius = ((record + 1) * Math.floor(totalRadius /g.recordCount)) - settings.donutGap;
+            clog("id=" + id + ", series=" + series + ", record=" + record + ", innerRadius=" + innerRadius + ", outer=" + radius)
+        }
+        if (polar)
+        {
+            innerRadius = 0;
+            radius = totalRadius / g.getMaxRecord(record) * val;
+        }
+        
+        var x1 = settings.width/2;                  // Centre X
+        var y1 = settings.height/2;                 // Centre Y
+        var x2 = (radius * Math.cos(a)) + (x1);     // Finishing X
+        var y2 = (radius * Math.sin(a)) + (y1);     // Finishing Y
+        
+        //Aesthetics        
+        settings.ctx.fillStyle = settings.colours[series] ;
+        settings.ctx.lineWidth = 3;
+        settings.ctx.strokeStyle = '#EAEAEA';
+        
+        //Drawing
+        var innerX = (innerRadius * Math.cos(d2r(eAngle))) + x1;
+        var innerY = (innerRadius * Math.sin(d2r(eAngle))) + y1;               
+                  
+        
         settings.ctx.beginPath();        
-        //var grd = settings.ctx.createLinearGradient(halfWidth, halfWidth, x2, y2);
-        //grd.addColorStop(0, settings.colours[0]);     
-        //grd.addColorStop(1, settings.colours[1]);                        
-        settings.ctx.fillStyle = settings.colours[0];          
-        settings.ctx.lineWidth = 1;
-        settings.ctx.strokeStyle = '#000';
-        
-        //Line drawing
-        var innerX = x1;
-        var innerY = y1;
-        settings.ctx.arc(halfWidth, halfWidth, radius, d2r(sAngle), d2r(eAngle));
+        settings.ctx.arc(x1, y1, radius, d2r(sAngle), d2r(eAngle));
         settings.ctx.lineTo(innerX,innerY); 
-        settings.ctx.arc(halfWidth, halfWidth, innerRadius, d2r(eAngle), d2r(sAngle), true);
+        settings.ctx.arc(x1, y1, innerRadius, d2r(eAngle), d2r(sAngle), true);
         settings.ctx.closePath();
         settings.ctx.stroke();        
-        settings.ctx.fill();
-        
-        
-        
-        
+        settings.ctx.fill();                            
     };
     o.touching = function(y,x)
     {

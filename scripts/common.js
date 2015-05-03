@@ -1,6 +1,7 @@
 ////////////////////////////////////////////////////
 //Initialisation
 ////////////////////////////////////////////////////
+
 init();
 
 
@@ -62,7 +63,7 @@ function debug(level, message)
     // 2 for debug notes ("x is 5")
     // 3 
 
-    if (level <= settings.debugLevel)
+    if (level <= env.debugLevel)
     {
         clog("DEBUG [" + level + "]:: " + message);
     }
@@ -198,12 +199,12 @@ function now()
 function init()
 {
     console.clear();
-    if (settings.production)
+    if (env.production)
     {
-        settings.debugLevel = 0;
+        env.debugLevel = 0;
     }
     else
     {
-        clog("---Running in debug mode at level " + settings.debugLevel + "---");
+        clog("---Running in debug mode at level " + env.debugLevel + "---");
     }
 }
