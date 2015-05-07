@@ -2,7 +2,7 @@
 //Placed in brackets to protect the scope
 {
     //Set theme name
-    var themeName = 'net.jcharts.greys';
+    var themeName = 'net.jCharts.greys';
     
     
     //Set bar colours

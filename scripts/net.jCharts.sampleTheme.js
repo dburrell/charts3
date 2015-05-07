@@ -2,7 +2,7 @@
 //Placed in brackets to protect the scope
 {
     //Set theme name
-    var themeName = 'net.jcharts.sampleTheme';
+    var themeName = 'net.jCharts.sampleTheme';
     
     
     //Set bar colours
@@ -30,6 +30,7 @@
     //Connect up
     var x = {};
     x.name = themeName;
+    clog("going to pull theme details from " + themeName);
     x.seriesColours = seriesColours;
     x.defaultOpacity = defaultOpacity;
     x.highlightedOpacity = highlightedOpacity;

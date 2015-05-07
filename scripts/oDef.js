@@ -227,28 +227,21 @@ function graph(type)
         o.settings.tooltipContents = s;
     };
     
-    o.setTheme = function(s)
+    o.setTheme = function(s, dir)
     {
-        var loadSuccess = false;
-        $.getScript(s + ".js", function()
-        {
-            loadSuccess = true;
-            alert("Script loaded and executed.");                   
-        });
+        var theme = env.themes[s];
+        g.settings.colours = theme.seriesColours;
+        g.settings.defaultOpacity = theme.defaultOpacity;
+        g.settings.highlightedOpacity = theme.highlightedOpacity;
+        g.settings.fontColour = theme.fontColour;
+        g.settings.font = theme.font;
+        clog("setting colors to " + g.settings.colours);
         
-        if (loadSuccess)
-        {
-            var theme = env.themes[s];
-            g.settings.colours = theme.seriesColours;
-            g.settings.defaultOpacity = theme.defaultOpacity;
-            g.settings.highlightedOpacity = theme.highlightedOpacity;
-            g.settings.fontColour = theme.fontColour;
-            g.settings.font = theme.font;                
-        }
-        else
-        {
-            debug(1,"Could not load file " + s + ".js");
-        }
+        clog("just tried to pull from " + s + ".js")
+        
+        
+    
+        
         
     };
     

@@ -7,7 +7,8 @@
 
 <script src="scripts/oDef.js"></script>
 <script src="scripts/chart.js"></script>
-<!--<script src="scripts/sampleTheme.js"></script>-->
+<script src="scripts/net.jCharts.sampleTheme.js"></script>
+<script src="scripts/net.jCharts.greys.js"></script>
 
 
 <script type="text/javascript" src="scripts/prettify.js"></script>
@@ -79,8 +80,8 @@
                 <br><br>
                 
                 <b>Theme</b><br>
-                <input type="radio" name="themeList" value="net.jcharts.sampleTheme" checked=true>net.jCharts.sampleTheme<br>
-                <input type="radio" name="themeList" value="net.jcharts.greys">net.jCharts.greys<br>
+                <input type="radio" name="themeList" value="net.jCharts.sampleTheme" checked=true>net.jCharts.sampleTheme<br>
+                <input type="radio" name="themeList" value="net.jCharts.greys">net.jCharts.greys<br>
                 <input type="radio" name="themeList" value="noTheme">No theme file - manually adjust<br>
                 
                 <br>
@@ -209,10 +210,10 @@
         }
         else
         {
-            code += "//Set the theme from file '" + theme + ".js'" + "<br>"
-            code += "g.setTheme('" + theme + "')  " + "<br><br>";
+            code += "//Set the theme from file.<br>//This assumes your html has a script tag with src '" + theme + ".js'" + "<br>"
+            code += "g.setTheme('" + theme + "');  " + "<br><br>";
             
-            g.setTheme(theme)            
+            g.setTheme(theme, 'scripts');
         }
         
         
