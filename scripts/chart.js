@@ -18,7 +18,7 @@
             
             //Colouring
             font: "'Titillium Web', sans-serif",                    // Font face
-            fontColor: '#888',                                      // Font colour
+            fontColour: '#888',                                      // Font colour
             fontSize: 12,                                           // Font size
             bgCol: "transparent",                                   // Canvas Background Colour            
             lineCol: "#333",                                        // For line chart or outside of bars
@@ -33,7 +33,7 @@
             width: 300,                                             // Width of canvas
             height: 300,                                            // Height of canvas
             margin: 40,                                             // Margin around drawarea
-            container: 'container',                                 // parent object - leave blank to make position absolute
+            container: '',                                          // parent object - leave blank to make position absolute
             
             //Axis info
             borderCol: "#aaa",                                      // For the axis borders                        
@@ -55,8 +55,13 @@
             tooltipContents:toolTipContentTypes.fullRecord,
             tooltipPercentages: true,
             
-            //Bar chart specifics            
+            //Colouring
             colours: ['#3498db', '#e67e22', '#16a085', '#34495e', '#e74c3c', '#95a5a6', '#1abc9c', '#f1c40f'],                                    
+            defaultOpacity:0.8,
+            highlightedOpacity:0.2,
+            
+            
+            //Bar chart specifics
             gap: 10,
             
             //Line chart specifics            
@@ -73,10 +78,9 @@
             donutGap: 5,
             
             //Types
-            seriesTypes: [],
-            //defaultType: types.stackedBar
+            seriesTypes: [],            
             defaultType: types.stackedBar
-            //defaultType: types.bar
+            
                         
         }, options);
 
@@ -98,23 +102,8 @@
         {        
             g.settings.seriesTypes[i] = settings.defaultType;
         } 
+        g.init();
         
-        //create canvas                
-        if (settings.ctx == null)
-        {
-            //settings.ctx = makeCanvas("canvas" + settings.randomNumber, settings.bgCol, settings.height, settings.width, settings.position, settings.left, settings.top, settings.container);
-            //g.init();
-            
-            $("#" + "canvas" + settings.randomNumber).hide();
-            
-            //On mouse over of this canvas, 
-            $( "#canvas" + settings.randomNumber).mousemove(function( event )
-            {                
-                var y = event.pageY;
-                var x = event.pageX;
-                g.mouseOver(y,x);                
-            });
-        }
                 
         g.settings.newObject = false;                
         //Pass values into graph object
@@ -166,13 +155,7 @@ function canvasWrite(ctx, txt, y, x, fontSize, font, color, align)
 
 function makeCanvas(id, bgCol, height, width, position, left, top, container)
 {
-    
-    clog("id is " + id)
-    clog("container is " + container)
-    
-    
-    
-    if (container == undefined )
+    if (typeof container == 'undefined' || container == 'body' || container == '')
     {
         container = "body";
     }
@@ -182,8 +165,10 @@ function makeCanvas(id, bgCol, height, width, position, left, top, container)
         position = "";
     }
     
-    var toAppend = "<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>";
     
+    
+    var toAppend = "<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>";
+    clog("in makeCanvas, container is " + container)
     $(container).append(toAppend);
     //$(container).append("<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>");
     var ctx = getContext(id);

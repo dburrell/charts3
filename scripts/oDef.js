@@ -23,10 +23,11 @@ function graph(type)
     
     o.init = function()
     {
+        clog("calling makeCanvas now with container of " + o.settings.container)
         o.settings.ctx = makeCanvas("canvas" + o.settings.randomNumber, o.settings.bgCol, o.settings.height, o.settings.width, o.settings.position, o.settings.left, o.settings.top, o.settings.container);
         o.settings.ctx.translate(0.5, 0.5);
         
-        clog("settings mouseOver fo #canvas" + o.settings.randomNumber);
+        
         //On mouse over of this canvas, 
         $( "#canvas" + o.settings.randomNumber).mousemove(function( event )
         {            
@@ -48,8 +49,8 @@ function graph(type)
     o.destroy = function()
     {
         clog("removing #canvas" + o.settings.randomNumber)
-      $("#canvas" + o.settings.randomNumber).hide();
-      $("#canvas" + o.settings.randomNumber).remove();
+        $("#canvas" + o.settings.randomNumber).hide();
+        $("#canvas" + o.settings.randomNumber).remove();
     };
     
     
@@ -178,6 +179,79 @@ function graph(type)
         o.settings.seriesTypes[i] = n;
     };
     
+    //Set the entire chart to a certain type
+    o.setChartType = function(n)
+    {
+        clog("seriesCount is " + o.seriesCount)
+        for (var i = 0; i < o.seriesCount;i++)
+        {
+          clog("setting series " + i + " to " + n);
+          o.setSeriesType(i,n);
+        }
+    };
+    
+    
+    
+    //Set animation speed
+    o.setAnimationTime = function(n)
+    {
+        if (n >= 0)
+        {
+            o.settings.totalTime = n;
+        }
+        else
+        {
+            o.settings.totalTime = 700;
+        }
+    };
+    
+    o.setContainer = function(s)
+    {
+        if (s == '' || typeof s == 'undefined' || s == null)
+        {
+            s = 'body';
+        }
+        o.settings.container = s;
+        $("#canvas" + o.settings.randomNumber).appendTo("#" + s);
+        $("#canvas" + o.settings.randomNumber).css("position","")
+    }
+    
+    o.setToolTipContents = function(s)
+    {
+        if (s == '' || typeof s == 'undefined' || s == null)
+        {
+            s = toolTipContentTypes.fullRecord;        
+        }
+        
+        clog("setting toolTipContents to " + s);
+        o.settings.tooltipContents = s;
+    };
+    
+    o.setTheme = function(s)
+    {
+        var loadSuccess = false;
+        $.getScript(s + ".js", function()
+        {
+            loadSuccess = true;
+            alert("Script loaded and executed.");                   
+        });
+        
+        if (loadSuccess)
+        {
+            var theme = env.themes[s];
+            g.settings.colours = theme.seriesColours;
+            g.settings.defaultOpacity = theme.defaultOpacity;
+            g.settings.highlightedOpacity = theme.highlightedOpacity;
+            g.settings.fontColour = theme.fontColour;
+            g.settings.font = theme.font;                
+        }
+        else
+        {
+            debug(1,"Could not load file " + s + ".js");
+        }
+        
+    };
+    
     //Import data from a table
     o.convertTable = function(tableSearchString)
     {
@@ -235,8 +309,10 @@ function graph(type)
     o.draw = function(startTime, first, animated)
     {
         animated = ifUnd(animated,true);        // default animated to true;
-        //startTime = ifUnd(startTime,now());     // default startTime to now();
-
+        if (o.settings.totalTime == 0)
+        {
+            animated = false;
+        }
         if (startTime == undefined)
         {
             o.draw(now(),true);
@@ -249,7 +325,7 @@ function graph(type)
 
             wipeCanvas("canvas" + o.settings.randomNumber);
 
-            
+            //Add borders and axis settings etc
             if (o.settings.seriesTypes[0] == types.bar
                 || o.settings.seriesTypes[0] == types.stackedBar
                 || o.settings.seriesTypes[0] == types.line
@@ -266,7 +342,7 @@ function graph(type)
                 for (var i = 0; i < o.recordCount; i++)
                 {
                     var x = (barWidth / 2) + (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1)));
-                    canvasWrite(ctx, o.records[i], o.settings.height - o.settings.margin + 12, x, o.settings.fontSize, o.settings.font, o.settings.fontColor, hAlign.centre)
+                    canvasWrite(ctx, o.records[i], o.settings.height - o.settings.margin + 12, x, o.settings.fontSize, o.settings.font, o.settings.fontColour, hAlign.centre)
                 }
             
             
@@ -316,22 +392,23 @@ function graph(type)
                 {
                     var val = minVal + (o.settings.yScale * i);
                     var y = ((o.settings.height - o.settings.margin) - (o.settings.height - o.settings.margin * 2) / yVals * i) + o.settings.fontSize / 2;
-                    canvasWrite(ctx, val, y, o.settings.margin - 3, o.settings.fontSize - 1, o.settings.font, o.settings.fontColor,hAlign.right)
+                    canvasWrite(ctx, val, y, o.settings.margin - 3, o.settings.fontSize - 1, o.settings.font, o.settings.fontColour,hAlign.right)
                 }
 
             
             }
             o.settings.fadeTime = 0;
             
-            //Calculate the timing fraction
-            var frac = (now() - (startTime + (o.settings.fadeTime * 1.5))) / o.settings.totalTime;
+            var frac = 1;
+            if (animated)
+            {
+                //Calculate the timing fraction
+                frac = (now() - (startTime + (o.settings.fadeTime * 1.5))) / o.settings.totalTime;
 
-            frac = Math.max(0, frac); // frac must not be below 0
-            frac = Math.min(1, frac); // frac must not be above 1
-
-                        
-                        
-                        
+                frac = Math.max(0, frac); // frac must not be below 0
+                frac = Math.min(1, frac); // frac must not be above 1
+            }
+                                                        
                         
             if (frac > 0)
             {
@@ -368,7 +445,8 @@ function graph(type)
                 //Clear the current objects
                 o.objects.clear();
 
-                var angleC = [];    
+                var angleC = [];
+                var counter = 0;
                 for (var i = 0; i < o.recordCount; i++)
                 {
                     angleC[i] = 0;
@@ -431,6 +509,7 @@ function graph(type)
                             var p1 = point(o.settings.height - o.settings.margin, (barShifts[series] * width) + (o.settings.margin + ((barWidth * record)) + (o.settings.gap * (record + 1))));
                             var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (barShifts[series]* width) + (o.settings.margin + (barWidth * record)) + ((o.settings.gap * (record + 1)) + width) );
                             var id = (o.recordCount*series) + record;
+                            id = o.objects.count;                            
                             var newObject = barObject(o.settings, series, p1, p2, id, series, record);
                             
                             o.objects.add(newObject);
@@ -446,6 +525,7 @@ function graph(type)
                             var p1 = point((o.settings.height - o.settings.margin) - stackLevels[record], (o.settings.margin + (barWidth * record) + (o.settings.gap * (record + 1))) + stackCount * stackOffset );
                             var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[record], (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth + stackCount * stackOffset);
                             var id = (o.recordCount*series) + record;
+                            id = o.objects.count;
                             var newObject = barObject(o.settings, series, p1, p2, id, series, record);
                             o.objects.add(newObject);
                             
@@ -484,6 +564,7 @@ function graph(type)
                             var x = (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth / 2;
                             var newPoint = point(y, x);
                             var id = (o.recordCount*series) + record;
+                            id = o.objects.count;
                             var newObject = dotObject(o.settings, i, newPoint, id, series, record);
                             o.objects.add(newObject);
                         }
@@ -502,6 +583,7 @@ function graph(type)
                                 var polar = o.settings.seriesTypes[series] == types.polar;  // is this a polar area chart?
                                 
                                 var id = (o.recordCount*series) + record;            // numeric id, as before
+                                id = o.objects.count;
                                 var deg = 0;                                    // the degrees this segment will take up
                                 
                                 if (polar)
@@ -537,6 +619,7 @@ function graph(type)
                         //Push new point into old point
                         oldPoint = newPoint;
 
+                        counter++;
                     }
 
                     //Draw all the objects
@@ -615,16 +698,14 @@ function graph(type)
     
     //Mouse over the graph object
     o.mouseOver = function(y,x)
-    {
-        //y -= o.settings.top;
-        //x -= o.settings.left;
+    {        
         var obj = $("#canvas" + o.settings.randomNumber)        
         y -= obj.offset().top;
         x -= obj.offset().left;
         
         var trueY = y + obj.offset().top;
         var trueX = x + obj.offset().left;
-        clog("position: " + x + "," + y)
+        
         var currentlyTouching = o.settings.touchedObject;        
         var touchingSomething = -1;
         
@@ -633,118 +714,135 @@ function graph(type)
             var obj = o.objects.objects[i];
             if (obj.touching(y,x))
             {
-                touchingSomething = i;                
+                touchingSomething = obj.id;                
             }            
         }
-        if (touchingSomething < 0)
-        {
-            o.settings.touchedObject = -1;
-            $('#tooltip' + o.settings.randomNumber).remove();
-        }
-        else
-        {
-            o.settings.touchedObject = touchingSomething;
-            //var series = Math.floor(touchingSomething/o.recordCount);
-            //var record = touchingSomething - (series * o.recordCount);
-                    
-            var series = o.objects.objects[touchingSomething].series;
-            var record = o.objects.objects[touchingSomething].record;
-                    
-            var contents = "";
-            
-            switch (o.settings.tooltipContents)
+        
+        var enableTooltips = true;
+        
+        //////////////////////////////////////////////////////
+        //Tooltips
+        //////////////////////////////////////////////////////
+        
+                        
+            if (touchingSomething < 0)
             {
-                case toolTipContentTypes.record:
-                    contents = "" + o.records[record] + "/" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
-                    break;
-                case toolTipContentTypes.fullRecord:
-                    
-                    var totalRecord = 0;
-                    if (o.settings.tooltipPercentages)
-                    {
-                        for (var i = 0; i < o.seriesCount;i++)                        
-                        {
-                            totalRecord += (o.values.get(i,record))*1;
-                        }
-                    }
-                    
-                    //Add the contents
-                    var contents = "<b><u>" + o.records[record] + "</u></b><br>";
-                    
-                    var maxSeriesLength = 0;
-                    for (var i = 0; i < o.seriesCount;i++)
-                    {
-                        maxSeriesLength = Math.max(maxSeriesLength,o.series[i].length)
-                    }
-                    for (var i = 0; i < o.seriesCount;i++)
-                    {
-                        if (i == series)
-                        {
-                            contents += "&gt; ";
-                        }
-                        else
-                        {
-                            contents += "&nbsp; ";
-                        }
-                        contents += fixLength((o.series[i] + ":"),maxSeriesLength + 2,'&nbsp;');
-                        contents += fixLength(o.values.get(i,record),3,'&nbsp;');
-                        
-                        if (o.settings.tooltipPercentages)
-                        {
-                            contents += "(" + Math.floor((100/totalRecord)*o.values.get(i,record)) + "%)";                            
-                        }
-                        
-                        contents += "<br>";
-                    }
-                    break;
-                case toolTipContentTypes.fullSeries:
-                    
-                    var totalSeries= 0;
-                    
-                    if (o.settings.tooltipPercentages)
-                    {
-                        for (var i = 0; i < o.recordCount;i++)                        
-                        {
-                            totalSeries += (o.values.get(series,i))*1;
-                        }
-                    }
-                    
-                    //Add the contents
-                    var contents = "<b>" + o.series[series] + "</b><br>";
-                    for (var i = 0; i < o.recordCount;i++)
-                    {
-                        if (i == record)
-                        {
-                            contents += "&gt; ";
-                        }
-                        else
-                        {
-                            contents += "&nbsp; ";
-                        }
-                        contents += fixLength((o.records[i] + ":"),10,'&nbsp;');
-                        contents += fixLength(o.values.get(series,i),3,'&nbsp;');
-                        
-                        if (o.settings.tooltipPercentages)
-                        {
-                            contents += "(" + Math.floor((100/totalSeries)*o.values.get(series,i)) + "%)";                            
-                        }
-                        
-                        contents += "<br>";
-                    }   
-                    
-                    break;
-                default:
-                    //same as "record"
-                    contents = "" + o.records[record] + "/" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
-                    break;
+                o.settings.touchedObject = -1;
+                if (enableTooltips)
+                {
+                    $('#tooltip' + o.settings.randomNumber).remove();
+                }
             }
-              
-            tooltip('tooltip' + o.settings.randomNumber, 'tooltip' + o.settings.randomNumber,trueY,trueX,contents)
-        }
+            else
+            {
+                o.settings.touchedObject = touchingSomething;
+                        
+                var series = o.objects.objects[touchingSomething].series;
+                var record = o.objects.objects[touchingSomething].record;
+                     
+                if (enableTooltips)
+                {
+                    var contents = "";
+                    
+                    switch (o.settings.tooltipContents)
+                    {
+                        case toolTipContentTypes.record:
+                            contents = "" + o.records[record] + "/" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
+                            break;
+                        case toolTipContentTypes.fullRecord:
+                            
+                            var totalRecord = 0;
+                            if (o.settings.tooltipPercentages)
+                            {
+                                for (var i = 0; i < o.seriesCount;i++)                        
+                                {
+                                    totalRecord += (o.values.get(i,record))*1;
+                                }
+                            }
+                            
+                            //Add the contents
+                            var contents = "<b><u>" + o.records[record] + "</u></b><br>";
+                            
+                            var maxSeriesLength = 0;
+                            for (var i = 0; i < o.seriesCount;i++)
+                            {
+                                maxSeriesLength = Math.max(maxSeriesLength,o.series[i].length)
+                            }
+                            for (var i = 0; i < o.seriesCount;i++)
+                            {
+                                if (i == series)
+                                {
+                                    contents += "&gt; ";
+                                }
+                                else
+                                {
+                                    contents += "&nbsp; ";
+                                }
+                                contents += fixLength((o.series[i] + ":"),maxSeriesLength + 2,'&nbsp;');
+                                contents += fixLength(o.values.get(i,record),3,'&nbsp;');
+                                
+                                if (o.settings.tooltipPercentages)
+                                {
+                                    contents += "(" + Math.floor((100/totalRecord)*o.values.get(i,record)) + "%)";                            
+                                }
+                                
+                                contents += "<br>";
+                            }
+                            break;
+                        case toolTipContentTypes.fullSeries:
+                            
+                            var totalSeries= 0;
+                            
+                            if (o.settings.tooltipPercentages)
+                            {
+                                for (var i = 0; i < o.recordCount;i++)                        
+                                {
+                                    totalSeries += (o.values.get(series,i))*1;
+                                }
+                            }
+                            
+                            //Add the contents
+                            var contents = "<b>" + o.series[series] + "</b><br>";
+                            for (var i = 0; i < o.recordCount;i++)
+                            {
+                                if (i == record)
+                                {
+                                    contents += "&gt; ";
+                                }
+                                else
+                                {
+                                    contents += "&nbsp; ";
+                                }
+                                contents += fixLength((o.records[i] + ":"),10,'&nbsp;');
+                                contents += fixLength(o.values.get(series,i),3,'&nbsp;');
+                                
+                                if (o.settings.tooltipPercentages)
+                                {
+                                    contents += "(" + Math.floor((100/totalSeries)*o.values.get(series,i)) + "%)";                            
+                                }
+                                
+                                contents += "<br>";
+                            }   
+                            
+                            break;
+                        default:
+                            //same as "record"
+                            contents = "" + o.records[record] + "/" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
+                            break;
+                    }
+                      
+                    tooltip('tooltip' + o.settings.randomNumber, 'tooltip' + o.settings.randomNumber,trueY,trueX,contents)
+                }
+            }
         
         if (o.settings.touchedObject != currentlyTouching)
         {
-            o.draw(now(),true,false);
+            clog("currentlyTouching " + currentlyTouching + ", touched is " + o.settings.touchedObject + " SO DRAWING");
+            o.draw(now(), false, false);
+        }
+        else
+        {
+            clog("currentlyTouching " + currentlyTouching + ", touched is " + o.settings.touchedObject);
         }
     }
     
@@ -753,6 +851,9 @@ function graph(type)
     {
         $('#tooltip' + o.settings.randomNumber).remove();
     }
+   
+    clog("running from graph function")
+    o.init();
     return o;
 }
 
@@ -842,7 +943,7 @@ function barObject(settings, i, p1, p2, id, series, record)
     o.drawOrder = 0;
     o.series = series;
     o.record = record;
-    
+    o.id = id;
     o.draw = function()
     {
         var y1 = Math.min(p1.y, p2.y);
@@ -856,11 +957,11 @@ function barObject(settings, i, p1, p2, id, series, record)
         
         if (id == settings.touchedObject)
         {                        
-            settings.ctx.globalAlpha=0.4;
+            settings.ctx.globalAlpha=g.settings.highlightedOpacity;
         }
         else
         {            
-            settings.ctx.globalAlpha=1;
+            settings.ctx.globalAlpha=g.settings.defaultOpacity;
         }
         settings.ctx.strokeStyle = settings.lineCol;
         settings.ctx.fillStyle = settings.colours[i];
@@ -897,7 +998,7 @@ function barObject(settings, i, p1, p2, id, series, record)
 
 
 
-function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar, series, record)
+function pieSliceObject(g, i, sAngle, eAngle, id, val, donut, polar, series, record)
 {
     var settings = g.settings;
     donut = ifUnd(donut,false);     // by default, NOT a donut
@@ -914,7 +1015,7 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar, series, reco
     o.touched = false;
     o.series = series;
     o.record = record;
-    
+    o.id = id;
     o.draw = function()
     {
         var deg = eAngle - sAngle;
@@ -926,15 +1027,16 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar, series, reco
         
         var innerRadius = 0;
         
-        var series = Math.floor(id/g.recordCount);
-        var record = id - (series*g.recordCount);
+        //var series = Math.floor(id/g.recordCount);
+        //var record = id - (series*g.recordCount);
+        
         if (donut)
-        {                                    
+        {                                                
             innerRadius = (record * Math.floor(totalRadius /g.recordCount));
             radius = ((record + 1) * Math.floor(totalRadius /g.recordCount)) - settings.donutGap;            
         }
         if (polar)
-        {
+        {            
             innerRadius = 0;
             radius = totalRadius / g.getMaxRecord(record) * val;
         }
@@ -954,18 +1056,21 @@ function pieSliceObject(g, i, sAngle, eAngle,id, val, donut, polar, series, reco
         o.innerRadius = innerRadius;
         o.outerRadius = radius;
         
-        //Aesthetics        
+        //Aesthetics
+        clog("adding series " + series)
         settings.ctx.fillStyle = settings.colours[series] ;
         settings.ctx.lineWidth = 3;
         settings.ctx.strokeStyle = '#EAEAEA';
         
-         if (id == settings.touchedObject)
+        clog("my id is " + id + " and settings.touchedObject is " + settings.touchedObject)
+        
+        if (id == settings.touchedObject)
         {                        
-            settings.ctx.globalAlpha=0.4;
+            settings.ctx.globalAlpha=g.settings.highlightedOpacity;
         }
         else
         {            
-            settings.ctx.globalAlpha=1;
+            settings.ctx.globalAlpha=g.settings.defaultOpacity;
         }
         
         //Drawing
@@ -1015,7 +1120,7 @@ function lineObject(settings, i, p1, p2, id, series, record)
     o.drawOrder = 0;
     o.series = series;
     o.record = record;
-    
+    o.id = id;
     o.draw = function()
     {        
         drawLine(settings.ctx, lineCol, settings.lineWidth, p1, p2);
@@ -1031,16 +1136,26 @@ function dotObject(settings, i, p, id, series, record)
     o.drawOrder = 1;
     o.series = series;
     o.record = record;
-    
+    o.id = id;
     o.draw = function()
     {
         settings.ctx.fillStyle = settings.dotFill;
         
         if (id == settings.touchedObject)
+        {                        
+            settings.ctx.globalAlpha=g.settings.highlightedOpacity;
+        }
+        else
+        {            
+            settings.ctx.globalAlpha=g.settings.defaultOpacity;
+        }
+        
+        if (id == settings.touchedObject)
         {
             clog("touching this dot");
-            settings.ctx.fillStyle = '#F00';
+         //   settings.ctx.fillStyle = '#F00';
         }
+        
         
         
         settings.ctx.beginPath();
@@ -1082,9 +1197,10 @@ function labelObject(settings, p, text)
     o.text = text;
     o.p1 = p;
     o.drawOrder = 99;
+    o.id = id;
     o.draw = function()
     {
-        canvasWrite(settings.ctx, text, o.p1.y, o.p1.x, settings.fontSize - 1, settings.font, settings.fontColor,hAlign.le)
+        canvasWrite(settings.ctx, text, o.p1.y, o.p1.x, settings.fontSize - 1, settings.font, settings.fontColour,hAlign.le)
     }
     return o;
 }

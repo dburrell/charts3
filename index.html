@@ -7,6 +7,7 @@
 
 <script src="scripts/oDef.js"></script>
 <script src="scripts/chart.js"></script>
+<!--<script src="scripts/sampleTheme.js"></script>-->
 
 
 <script type="text/javascript" src="scripts/prettify.js"></script>
@@ -57,15 +58,37 @@
             </td>
                       
             <!--CONTROLS ON THE RIGHT -->      
-            <td rowspan=1  width=300px>                 
+            <td rowspan=2  width=300px>                 
+                <b>Chart Type</b><br>
                 <input type="radio" name="chartType" value="DEFAULT" checked=true>Default<br>
-                <input type="radio" name="chartType" value="BAR">Bar<br>
-                <input type="radio" name="chartType" value="STACKEDBAR">Stacked Bar<br>
-                <input type="radio" name="chartType" value="PIE">Pie<br>
-                <input type="radio" name="chartType" value="DONUT">Donut<br>
-                <input type="radio" name="chartType" value="POLAR">Polar<br>
+                <input type="radio" name="chartType" value="bar">Bar<br>
+                <input type="radio" name="chartType" value="stackedBar">Stacked Bar<br>
+                <input type="radio" name="chartType" value="pie">Pie<br>
+                <input type="radio" name="chartType" value="donut">Donut<br>
+                <input type="radio" name="chartType" value="polar">Polar<br>
+                
+                
+                <br><br><br><b>Animation Time</b><br>
+                <input type="range" id="animationTimeRange" min="0" max="10" value="7"><br><br>
+                
+                <b>Tooltip Contents</b><br>
+                <input type="radio" name="tipContent" value="DEFAULT" checked=true>Default<br>
+                <input type="radio" name="tipContent" value="record">Single Value<br>
+                <input type="radio" name="tipContent" value="fullRecord">Full Record<br>
+                <input type="radio" name="tipContent" value="fullSeries">Full Series<br>
+                <br><br>
+                
+                <b>Theme</b><br>
+                <input type="radio" name="themeList" value="net.jcharts.sampleTheme" checked=true>net.jCharts.sampleTheme<br>
+                <input type="radio" name="themeList" value="net.jcharts.greys">net.jCharts.greys<br>
+                <input type="radio" name="themeList" value="noTheme">No theme file - manually adjust<br>
+                
+                <br>
                 <button onclick="writeCode()">Draw</button>
             </td>
+            
+            
+            
         </tr>
         <tr>
             <td></td>
@@ -85,95 +108,123 @@
     
 </body>
 <script>
-    //var g = graph();
-    //g.addSeries("History");
-    //g.addSeries("Maths");
-    
-    //g.addRecord("Alice",[90,70]);
-    //g.convertTable("#dataTable");
-    var g = $('#dataTable').jChart({width:300, dsa:23});
-    
-    //g.settings.seriesTypes[1] = types.scatter;
-    //g.draw();
-    
+    var g = null;
+      
     writeCode();
     
     function writeCode()
-    {
-        
-        var defaultSeriesType = '';
-        var seriesType = $("input[name=chartType]:checked").val();
-        
-        switch(seriesType)
-        {
-            case 'DEFAULT':
-                seriesType = types.stackedBar;
-                defaultSeriesType = "";
-                break;
-            case 'BAR':
-                defaultSeriesType = ", defaultType: types.Bar";
-                seriesType = types.bar;
-                break;
-            case 'STACKEDBAR':
-                defaultSeriesType = ", defaultType: types.stackedBar";
-                seriesType = types.stackedBar;
-                break;
-            case 'PIE':
-                clog("pie");
-                defaultSeriesType = ", defaultType: types.pie";
-                seriesType = types.pie;
-                break;
-            case 'DONUT':
-                defaultSeriesType = ", defaultType: types.donut";
-                seriesType = types.donut;
-                break;
-            case 'POLAR':
-                defaultSeriesType = ", defaultType: types.polar";
-                seriesType = types.polar;
-                break;
-            default:
-                seriesType = types.stackedBar;
-                defaultSeriesType = "";
-                break;
-        }
-        
-        
+    {        
         var code = "";
-        
-        ////////////////////////////////////////////////////////////////
-        //Graph type
-        ////////////////////////////////////////////////////////////////
-        code += "//Make the graph object using data from the table" + "<br>"
-        code += "var g = $('#dataTable').jChart({width:300 " + defaultSeriesType + "});" + "<br><br>";
-        
-        
-        
-        
-        
-        
-        
-        
         
         ////////////////////////////////////////////////////////////////
         //Create the new graph object
         ////////////////////////////////////////////////////////////////
-        g.destroy();
-        g = $('#dataTable').jChart({width:300, defaultType: seriesType});
+        code += "//Make the graph object using data from the table" + "<br>"
+        code += "var g = $('#dataTable').jChart({width:300});" + "<br><br>";
+        if (g != null)
+        {
+            g.destroy();    
+        }        
+        g = $('#dataTable').jChart({width:300});
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Set position
+        ////////////////////////////////////////////////////////////////
+        code += "//Set parent object (optional, otherwise chart will be set to position:absolute)" + "<br>"
+        code += "g.setContainer('container');   //e.g. object with id 'container'" + "<br><br>";        
+        
+        g.setContainer('container');
         
         
         
         ////////////////////////////////////////////////////////////////
-        //Draw the graph
+        //Set type
         ////////////////////////////////////////////////////////////////
-        g.init();
+        var seriesType = $("input[name=chartType]:checked").val();
+        if (seriesType != "DEFAULT")
+        {
+            code += "//Set the chart type" + "<br>"
+            code += "g.setChartType(types." + seriesType + ")  " + "<br><br>";
+            
+            g.setChartType(types[seriesType]);                
+        }
+        
+        
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Set animation speed
+        ////////////////////////////////////////////////////////////////
+        var animationTime = $("#animationTimeRange")[0].value;                
+        code += "//Set the animation time (optional)" + "<br>"
+        code += "g.setAnimationTime(" + (animationTime * 100) + ")";
+        
+        if (animationTime > 0)
+        {
+            code += "  // animation will take " + (animationTime * 100) + " ms" + "<br><br>";            
+        }
+        else
+        {
+            code += "  // animation will be disabled" + "<br><br>";
+        }
+        g.setAnimationTime(animationTime*100);          
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Set tooltip contents
+        ////////////////////////////////////////////////////////////////
+        var tipContents = $("input[name=tipContent]:checked").val();
+        
+        if (tipContents != "DEFAULT")
+        {
+            code += "//Set the tooltip content" + "<br>"
+            code += "g.setToolTipContents(toolTipContentTypes." + tipContents + ")  " + "<br><br>";
+            
+            g.setToolTipContents(toolTipContentTypes[tipContents]);            
+        }
+        
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Set theme
+        ////////////////////////////////////////////////////////////////
+        var theme = $("input[name=themeList]:checked").val();
+        
+        if (theme == "noTheme")
+        {
+            code += "//Don't set a theme, set details manually" + "<br>"
+            code += "g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f']; " + "<br>";
+            code += "g.settings.defaultOpacity = 1;" + "<br>";
+            code += "g.settings.highlightedOpacity = 0.1;" + "<br>";
+            code += "g.settings.fontColour = '#F00';" + "<br>";
+            code += "g.settings.font = 'arial';" + "<br>";
+            code += "<br>";
+            
+            g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f'];
+            g.settings.defaultOpacity = 1;
+            g.settings.highlightedOpacity = 0.1;
+            g.settings.fontColour = '#F00';
+            g.settings.font = 'arial';            
+        }
+        else
+        {
+            code += "//Set the theme from file '" + theme + ".js'" + "<br>"
+            code += "g.setTheme('" + theme + "')  " + "<br><br>";
+            
+            g.setTheme(theme)            
+        }
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Draw the graph & write the code
+        ////////////////////////////////////////////////////////////////
         g.draw();
         
         code += "//Draw the graph" + "<br>"
         code += "g.draw();";
-        //prettify();
+        
         $("#code").html(code);
-        
-        
         
         ////////////////////////////////////////////////////////////////
         //reprettify everything (see http://stackoverflow.com/questions/16127015/how-to-re-apply-prettyprint-after-run-prettify-js-has-been-loaded)
