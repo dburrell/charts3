@@ -55,15 +55,20 @@ body
 {
     position:absolute;
     bottom:5px;
-    right:5px;
+    right:10px;
     font-size:10px;
 }
 .footerLink a
 {
-    color:#fafafa;
+    color:#3a3a3a;
+    font-weight:bold;
     text-decoration:none;
 }
 
+.footerLink a:hover
+{
+    color:#3a3;
+}
 #footer
 {
     position:absolute;
@@ -71,7 +76,7 @@ body
     left:0px;
     height:20px;
     width:100%;
-    background-color:#000;
+    
 }
 
 canvas
