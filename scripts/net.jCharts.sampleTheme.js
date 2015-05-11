@@ -1,41 +1,35 @@
 
 //Placed in brackets to protect the scope
 {
+    var theme = {};
+    
     //Set theme name
-    var themeName = 'net.jCharts.sampleTheme';
+    theme.themeName = 'net.jCharts.sampleTheme';
     
     
     //Set bar colours
-    var seriesColours = [];
-    seriesColours[0] = '#3498db';
-    seriesColours[1] = '#e67e22';
-    seriesColours[2] = '#16a085';
-    seriesColours[3] = '#34495e';
-    seriesColours[4] = '#e74c3c';
-    seriesColours[5] = '#95a5a6';
-    seriesColours[6] = '#1abc9c';
-    seriesColours[7] = '#f1c40f';
+    theme.colours = [];
+    theme.colours[0] = '#3498db';
+    theme.colours[1] = '#e67e22';
+    theme.colours[2] = '#16a085';
+    theme.colours[3] = '#34495e';
+    theme.colours[4] = '#e74c3c';
+    theme.colours[5] = '#95a5a6';
+    theme.colours[6] = '#1abc9c';
+    theme.colours[7] = '#f1c40f';
+    
+    //Object line
+    theme.lineColor = '#EAEAEA';
+    theme.lineWidth = 1;
     
     //Opacities
-    var defaultOpacity = 1;
-    var highlightedOpacity = 0.4;
+    theme.defaultOpacity = 1;
+    theme.highlightedOpacity = 0.4;
     
     //Font
-    var fontColour = '#888';
-    var font = "'Titillium Web', sans-serif";
+    theme.fontColour = '#888';
+    theme.font = "'Titillium Web', sans-serif";
     
-    
-    
-    
-    //Connect up
-    var x = {};
-    x.name = themeName;
-    clog("going to pull theme details from " + themeName);
-    x.seriesColours = seriesColours;
-    x.defaultOpacity = defaultOpacity;
-    x.highlightedOpacity = highlightedOpacity;
-    x.fontColour = fontColour;
-    x.font = font;
-    
-    env.themes[x.name] = x;    
+    //Connect up    
+    env.themes[theme.themeName] = theme;    
 }

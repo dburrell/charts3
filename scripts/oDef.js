@@ -1,5 +1,11 @@
+var f = 1;
+
+
 function graph(type)
 {
+    inFunction("graph()");
+    
+    debug(1,"Setting graph defaults in template to return");
     var o = {};
     o.colors = ['#1abc9c', '#3498db', '#9b59b6', '#34495e', '#e67e22', '#e74c3c', '#95a5a6', '#27ae60', '#2980b9', '#d35400'];
 
@@ -23,11 +29,13 @@ function graph(type)
     
     o.init = function()
     {
-        clog("calling makeCanvas now with container of " + o.settings.container)
+        inFunction("graph init()");
+        
+        debug(2,"Generating canvas with random number " + o.settings.randomNumber);
         o.settings.ctx = makeCanvas("canvas" + o.settings.randomNumber, o.settings.bgCol, o.settings.height, o.settings.width, o.settings.position, o.settings.left, o.settings.top, o.settings.container);
         o.settings.ctx.translate(0.5, 0.5);
         
-        
+        debug(2,"Setting mouse movement catcher");
         //On mouse over of this canvas, 
         $( "#canvas" + o.settings.randomNumber).mousemove(function( event )
         {            
@@ -41,7 +49,7 @@ function graph(type)
             o.mouseExit();
             
         });
-        
+        outFunction("o.init()");
     };
     
     
@@ -60,6 +68,7 @@ function graph(type)
     o.addSeries = function(s)
     {
         o.seriesNames[s] = o.seriesCount;
+        //o.settings.labelTypes[o.seriesCount] = o.labelTypeDefault;
         o.series[o.seriesCount] = s;
         o.seriesCount++;
     };
@@ -82,19 +91,21 @@ function graph(type)
 
     //Get a value e.g. get("Alice","Maths")
     o.get = function(recordKey, seriesKey)
-    {
+    {        
         try
         {
             var y = o.recordNames[recordKey];
             var x = o.seriesNames[seriesKey];
-
+                        
             return o.values.get(x, y);
         }
         catch (e)
         {
             debug(1, "Could not return values from series '" + seriesKey + "' in record '" + recordKey + "'");
+                        
             return false;
         }
+        
     }
 
     //Set a value e.g. set("Alice","Maths",77)
@@ -176,18 +187,23 @@ function graph(type)
     //Set a different series type
     o.setSeriesType = function(i,n)
     {
+        inFunction("graph setSeriesType");
+        
+        debug(1,"setting seriesType[" + i + "] to '" + n + "'")
         o.settings.seriesTypes[i] = n;
+        
+        outFunction("graph setSeriesType");
     };
     
     //Set the entire chart to a certain type
     o.setChartType = function(n)
     {
-        clog("seriesCount is " + o.seriesCount)
+        inFunction("graph setChartType")
         for (var i = 0; i < o.seriesCount;i++)
-        {
-          clog("setting series " + i + " to " + n);
+        {          
           o.setSeriesType(i,n);
         }
+        outFunction("graph setChartType")
     };
     
     
@@ -195,60 +211,84 @@ function graph(type)
     //Set animation speed
     o.setAnimationTime = function(n)
     {
+        inFunction("graph setAnimationTime")
         if (n >= 0)
-        {
+        {            
             o.settings.totalTime = n;
         }
         else
-        {
+        {        
             o.settings.totalTime = 700;
         }
+        
+        debug(1,"setting totalTime to " + o.settings.totalTime);
+        outFunction("graph setAnimationTime")
     };
     
     o.setContainer = function(s)
     {
+        inFunction("graph setContainer()");
+        
         if (s == '' || typeof s == 'undefined' || s == null)
         {
             s = 'body';
         }
         o.settings.container = s;
+        debug(1,"setting container to '" + s + "'")
+        
         $("#canvas" + o.settings.randomNumber).appendTo("#" + s);
         $("#canvas" + o.settings.randomNumber).css("position","")
+        
+        outFunction("graph setContainer()");
     }
     
     o.setToolTipContents = function(s)
     {
+        inFunction("setToolTipContents");
         if (s == '' || typeof s == 'undefined' || s == null)
         {
             s = toolTipContentTypes.fullRecord;        
         }
         
-        clog("setting toolTipContents to " + s);
+        debug(1,"setting toolTipContents to " + s);
         o.settings.tooltipContents = s;
+        
+        
+        outFunction("setToolTipContents");
     };
     
     o.setTheme = function(s, dir)
     {
+        inFunction("graph setTheme()")
+        
+        debug(1,"Setting theme to '" + s + "'");
+        
         var theme = env.themes[s];
-        g.settings.colours = theme.seriesColours;
-        g.settings.defaultOpacity = theme.defaultOpacity;
-        g.settings.highlightedOpacity = theme.highlightedOpacity;
-        g.settings.fontColour = theme.fontColour;
-        g.settings.font = theme.font;
-        clog("setting colors to " + g.settings.colours);
         
-        clog("just tried to pull from " + s + ".js")
+        for(var propertyName in theme)
+        {            
+            var oldVal = g.settings[propertyName];
+            var newVal = theme[propertyName];
+            
+            if (oldVal == undefined)
+            {
+                debug(1,"WARNING: Could not find property '" + propertyName + "' in settings.");
+            }
+            else
+            {
+                g.settings[propertyName] = newVal;             
+            }
+                        
+         }
         
-        
-    
-        
-        
+        outFunction("graph setTheme()");        
     };
     
     //Import data from a table
     o.convertTable = function(tableSearchString)
     {
-        debug(3,"Converting table")
+        inFunction("graph convertTable");
+        
         var table = $(tableSearchString);
 
         table.find('tr').each(function(y)
@@ -280,28 +320,34 @@ function graph(type)
             if (y == 0)
             {
                 //Add the series collection
-                debug(3,"-> Adding series headers")
+                debug(1,"Adding series headers")
                 for (var i = 1; i < vals.length; i++)
-                {
-                    debug(3,"--> Adding Series " + vals[i])
+                {                    
                     o.addSeries(vals[i]);
                 }
-                debug(3,"--> Completed.")
+                
             }
             else
             {
-                //Add a new record
-                debug(3,"-> adding record " + record)
+                debug(1,"Adding row " + y)
+                //Add a new record                
                 o.addRecord(record, vals);
             }
         });
-        debug(3,"-> All records added.")
+        
+        outFunction("graph convertTable");
     };
 
     //Animated Draw Function
     o.draw = function(startTime, first, animated)
     {
+        inFunction("graph DRAW",3);
+        
+        
         animated = ifUnd(animated,true);        // default animated to true;
+        
+        
+        
         if (o.settings.totalTime == 0)
         {
             animated = false;
@@ -312,6 +358,8 @@ function graph(type)
         }
         else
         {
+            debug(3,"animation is " + animated);
+            debug(3,"startTime is " + startTime);
             var stackLevels = [];                
             var barWidth = ((o.settings.width - (2 * o.settings.margin)) - (o.settings.gap * (o.recordCount + 1))) / o.recordCount; // calculate bar width based on total columns etc
             var ctx = o.settings.ctx;
@@ -468,16 +516,16 @@ function graph(type)
                         ///////////////////////////////////////////
                         //Add labels
                         ///////////////////////////////////////////
-                        if (o.settings.labels[series] != "none")
+                        if (o.settings.labelTypes[series] != "none")
                         {
                             var displayVal = "";
 
                             //What value to show?
-                            if (o.settings.labels[series] == "value")
+                            if (o.settings.labelTypes[series] == "value")
                             {
                                 displayVal = originalval;
                             }
-                            if (o.settings.labels[series] == "name")
+                            if (o.settings.labelTypes[series] == "name")
                             {
                                 displayVal = o.records[record];
                             }
@@ -489,8 +537,8 @@ function graph(type)
                             var labelYOffset = o.settings.labelYOffset;
                             var newPoint = point(y + labelYOffset, x + o.settings.labelXOffset);
 
-                            var newObject = labelObject(o.settings, newPoint, displayVal)
-                            objects.add(newObject);
+                            var newObject = labelObject(o.settings, newPoint, displayVal, o.objects.count)
+                            o.objects.add(newObject);
                         }
 
                         ///////////////////////////////////////////
@@ -615,8 +663,18 @@ function graph(type)
                         counter++;
                     }
 
-                    //Draw all the objects
-                    o.objects.drawAll();
+                    
+                    
+                    
+                }
+                
+                //Draw all the objects
+                o.objects.drawAll();
+                if (o.settings.seriesTypes[0] == types.donut)
+                {
+                    //findme
+                    clog("about to stroke")
+                    //g.settings.ctx.stroke();
                 }
             }
 
@@ -648,6 +706,7 @@ function graph(type)
 
             }
         }
+        outFunction("graph DRAW",3);    
     }
 
     //Show data in console for analysis 
@@ -830,12 +889,12 @@ function graph(type)
         
         if (o.settings.touchedObject != currentlyTouching)
         {
-            clog("currentlyTouching " + currentlyTouching + ", touched is " + o.settings.touchedObject + " SO DRAWING");
+            debug(4,"currentlyTouching " + currentlyTouching + ", touched is " + o.settings.touchedObject + " SO DRAWING");
             o.draw(now(), false, false);
         }
         else
         {
-            clog("currentlyTouching " + currentlyTouching + ", touched is " + o.settings.touchedObject);
+            debug(4,"currentlyTouching " + currentlyTouching + ", touched is " + o.settings.touchedObject);
         }
     }
     
@@ -844,9 +903,11 @@ function graph(type)
     {
         $('#tooltip' + o.settings.randomNumber).remove();
     }
-   
-    clog("running from graph function")
-    o.init();
+       
+    //20150511 - commented this as seems redundant
+    //o.init();
+    
+    outFunction("graph()");
     return o;
 }
 
@@ -928,7 +989,7 @@ function array2d()
 ///////////////////////////////////////////
 
 //Bar object template
-function barObject(settings, i, p1, p2, id, series, record)
+function barObject(settings, i, p1, p2, id, series, record, stacked)
 {
     var o = {};
     o.p1 = p1;
@@ -936,6 +997,11 @@ function barObject(settings, i, p1, p2, id, series, record)
     o.drawOrder = 0;
     o.series = series;
     o.record = record;
+    o.type = types.bar;
+    if (stacked)
+    {
+        o.type = types.stackedBar
+    }
     o.id = id;
     o.draw = function()
     {
@@ -948,6 +1014,8 @@ function barObject(settings, i, p1, p2, id, series, record)
         y2 = y2 - y1;
         x2 = x2 - x1;
         
+        settings.ctx.beginPath();
+        
         if (id == settings.touchedObject)
         {                        
             settings.ctx.globalAlpha=g.settings.highlightedOpacity;
@@ -956,13 +1024,19 @@ function barObject(settings, i, p1, p2, id, series, record)
         {            
             settings.ctx.globalAlpha=g.settings.defaultOpacity;
         }
-        settings.ctx.strokeStyle = settings.lineCol;
+        
+        
+        settings.ctx.lineWidth = settings.lineWidth;        
+        settings.ctx.strokeStyle = settings.lineColor;         
         settings.ctx.fillStyle = settings.colours[i];
         
         settings.ctx.moveTo(x1, y1);
+        
         settings.ctx.fillRect(x1, y1, x2, y2);
         settings.ctx.rect(x1, y1, x2, y2);
         settings.ctx.globalAlpha=1;
+        settings.ctx.stroke();
+        settings.ctx.lineWidth = 0;  
     };
 
     
@@ -1008,20 +1082,25 @@ function pieSliceObject(g, i, sAngle, eAngle, id, val, donut, polar, series, rec
     o.touched = false;
     o.series = series;
     o.record = record;
+    o.type = types.pie;
+    if (donut)
+    {
+        o.type = types.donut;
+    }
+    if (polar)
+    {
+        o.type = types.polar;
+    }
     o.id = id;
     o.draw = function()
     {
         var deg = eAngle - sAngle;
-        //var a = r2d(deg);
         var a = deg;
         
         var totalRadius = settings.width/4;
         var radius = totalRadius;
         
         var innerRadius = 0;
-        
-        //var series = Math.floor(id/g.recordCount);
-        //var record = id - (series*g.recordCount);
         
         if (donut)
         {                                                
@@ -1049,13 +1128,11 @@ function pieSliceObject(g, i, sAngle, eAngle, id, val, donut, polar, series, rec
         o.innerRadius = innerRadius;
         o.outerRadius = radius;
         
-        //Aesthetics
-        clog("adding series " + series)
+        //Aesthetics        
         settings.ctx.fillStyle = settings.colours[series] ;
-        settings.ctx.lineWidth = 3;
-        settings.ctx.strokeStyle = '#EAEAEA';
-        
-        clog("my id is " + id + " and settings.touchedObject is " + settings.touchedObject)
+        settings.ctx.lineWidth = settings.lineWidth;        
+        settings.ctx.strokeStyle = settings.lineColor;
+                
         
         if (id == settings.touchedObject)
         {                        
@@ -1075,29 +1152,45 @@ function pieSliceObject(g, i, sAngle, eAngle, id, val, donut, polar, series, rec
         settings.ctx.arc(x1, y1, radius, d2r(sAngle), d2r(eAngle));
         settings.ctx.lineTo(innerX,innerY); 
         settings.ctx.arc(x1, y1, innerRadius, d2r(eAngle), d2r(sAngle), true);
+        
+        if (settings.lineColor > 0)
+        {
+            settings.ctx.stroke();    
+        }
+        
+        
         settings.ctx.closePath();
-        settings.ctx.stroke();        
+        
         settings.ctx.fill();
+        
+        
         settings.ctx.globalAlpha=1;
     };
     o.touching = function(y,x)
     {
         var len = findLength(o.centreX,o.centreY,x,y);
-        var angle = findAngle(o.centreX,o.centreY,x,y);
+        var touching = false;
         
-        if (between(len,o.innerRadius,o.outerRadius) && between(angle,o.startAngle,o.endAngle))
-        {            
-            o.touched = true;            
-            return true;
+        if (between(len,o.innerRadius,o.outerRadius))
+        {
+            var angle = findAngle(o.centreX,o.centreY,x,y);
+            if (between(angle,o.startAngle,o.endAngle))
+            {             
+                touching = true;    
+            }
+            else
+            {                
+                touching = false;
+            }
+            
         }
         else
-        {
-            //clog("o.y1: " + o.centreY + ", o.x1: " + o.centreX + ", len: " + len + ", angle: " + angle);
-            o.touched = false;
-            return false;
+        {                        
+            touching = false;
         }
         
-        return false;
+        
+        return touching;
     }
     
     return o;
@@ -1184,13 +1277,14 @@ function dotObject(settings, i, p, id, series, record)
 }
 
 //Label object template
-function labelObject(settings, p, text)
+function labelObject(settings, p, text, id)
 {
     var o = {};
     o.text = text;
     o.p1 = p;
     o.drawOrder = 99;
     o.id = id;
+    
     o.draw = function()
     {
         canvasWrite(settings.ctx, text, o.p1.y, o.p1.x, settings.fontSize - 1, settings.font, settings.fontColour,hAlign.le)
@@ -1242,8 +1336,7 @@ function objectsCollection()
                     child.draw();
                 }
             }
-        }
-
+        }        
     }
 
 

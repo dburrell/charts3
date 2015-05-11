@@ -4,7 +4,7 @@
 ////////////////////////////////////////////////////
 var env = {};
 env.production = false;
-env.debugLevel = 4;
+env.debugLevel = 2;
 env.debugLabel = '';
 env.themes = {};
 

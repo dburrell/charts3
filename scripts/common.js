@@ -3,7 +3,7 @@
 ////////////////////////////////////////////////////
 
 init();
-
+var debugFunctionCount = 0;
 
 
 
@@ -56,17 +56,72 @@ function tooltip(id, classes, y, x, contents)
 //Debugging Functions
 ////////////////////////////////////////////////////
 
+var debugLineCount = 5;
+
 //Debug
 function debug(level, message)
 {
-    // 1 for positions
-    // 2 for debug notes ("x is 5")
+    // 1 for useful
+    // 2 for function flow (now tabbed!)
     // 3 
 
     if (level <= env.debugLevel)
     {
-        clog("DEBUG [" + level + "]:: " + message);
+        var d = "-";
+        
+        d = repeatChar(" ",debugFunctionCount) ;
+        
+        //clog("debugFunctionCount is " + debugFunctionCount)
+        
+        for (var i = 1; i < d.length; i+= debugLineCount)
+        {
+            len = d.length;
+            
+            var newD = d.substring(0,(i-1)) + " " + d.substring(i,len)
+            //var newD = d;
+            d = newD
+        }
+        
+        
+        var functionChar = "";
+        if (message.substring(0,1) == "{")
+        {            
+            functionChar  = "";                    
+        }
+        if (message.substring(0,1) == "}")
+        {            
+            functionChar  = "";                    
+        }            
+        clog("[" + level + "]: " + d + functionChar + " " + message);        
     }
+}
+
+
+function inFunction(s, debugLevel)
+{        
+    if (debugLevel == undefined)
+    {
+        debugLevel = 2;
+    }
+    debug(debugLevel,"FUNCTION " + s);
+    debug(debugLevel ,"{");
+    debugFunctionCount+=debugLineCount;     
+}
+
+function outFunction(s, debugLevel)
+{
+    if (debugLevel == undefined)
+    {
+        debugLevel = 2;
+    }
+    debugFunctionCount-=debugLineCount;
+    debug(debugLevel ,"}");
+    debug(debugLevel ,"");
+    //debug(2,"LEAVING function " + s);
+    
+    
+    //debugFunctionCount-=debugLineCount;
+    
 }
 
 //A lazy shortcut to debug

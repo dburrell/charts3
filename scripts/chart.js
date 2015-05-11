@@ -4,6 +4,7 @@
 {
     $.fn.jChart = function(options)
     {
+        inFunction("$.fn.jChart - setting defaults");
         /////////////////////////
         //parameters
         /////////////////////////
@@ -44,7 +45,8 @@
             currency: '',                                           // taken from any leading symbols in the data
             
             //Labels
-            labels: ["none","none","none"],                         // none/name/value - what to show on labels
+            labelTypes: [],                                         // none/name/value - what to show on labels
+            labelTypeDefault: "none",
             labelYOffset: 14,                                       // Y offset positioning of labels
             labelXOffset: 3,                                        // X offset positioning of labels
                         
@@ -56,10 +58,12 @@
             tooltipPercentages: true,
             
             //Colouring
+            themeName: 'manual',
             colours: ['#3498db', '#e67e22', '#16a085', '#34495e', '#e74c3c', '#95a5a6', '#1abc9c', '#f1c40f'],                                    
             defaultOpacity:0.8,
             highlightedOpacity:0.2,
-            
+            lineColor:'#EAEAEA',
+            lineWidth:3,
             
             //Bar chart specifics
             gap: 10,
@@ -97,19 +101,22 @@
         g.convertTable(this);       // import data
         g.settings = settings;
         
-        //Default the seriesTypes to bar
+        //Set the defaults
         for(var i = 0; i <= g.seriesCount; i++)
         {        
             g.settings.seriesTypes[i] = settings.defaultType;
+            g.settings.labelTypes[i] = settings.labelTypeDefault;
         } 
-        g.init();
         
-                
+        g.init();
         g.settings.newObject = false;                
-        //Pass values into graph object
-        //g.settings = settings;
-                
-        //Return the object
+        
+        
+        
+        
+        outFunction("$.fn.jChart");
+        
+        //Return the template
         return g;    
     };
 }(jQuery));
@@ -168,7 +175,7 @@ function makeCanvas(id, bgCol, height, width, position, left, top, container)
     
     
     var toAppend = "<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>";
-    clog("in makeCanvas, container is " + container)
+    
     $(container).append(toAppend);
     //$(container).append("<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>");
     var ctx = getContext(id);

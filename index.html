@@ -51,7 +51,11 @@
                         <td><center>$60.00</center></td> 
                     </tr>
                 </table>
+                
+               
             </td>
+
+            
             
             <!--CHART IN THE MIDDLE -->
             <td  width=600px>                
@@ -114,13 +118,14 @@
     writeCode();
     
     function writeCode()
-    {        
+    {
+        debug(1,"Generating graph & applying properties as set by UI")
         var code = "";
         
         ////////////////////////////////////////////////////////////////
-        //Create the new graph object
+        //Create the new chart object
         ////////////////////////////////////////////////////////////////
-        code += "//Make the graph object using data from the table" + "<br>"
+        code += "//Make the chart object using data from the table" + "<br>"
         code += "var g = $('#dataTable').jChart({width:300});" + "<br><br>";
         if (g != null)
         {
@@ -196,16 +201,22 @@
         {
             code += "//Don't set a theme, set details manually" + "<br>"
             code += "g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f']; " + "<br>";
+            code += "g.settings.lineColor = #777;" + "<br>";
+            code += "g.settings.lineWidth = 0;" + "<br>";
             code += "g.settings.defaultOpacity = 1;" + "<br>";
-            code += "g.settings.highlightedOpacity = 0.1;" + "<br>";
-            code += "g.settings.fontColour = '#F00';" + "<br>";
+            code += "g.settings.highlightedOpacity = 0.4;" + "<br>";
+            code += "g.settings.fontColour = '#000';" + "<br>";
             code += "g.settings.font = 'arial';" + "<br>";
             code += "<br>";
             
             g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f'];
+            
+            g.settings.lineColor = '#777';
+            g.settings.lineWidth = 0;
+    
             g.settings.defaultOpacity = 1;
-            g.settings.highlightedOpacity = 0.1;
-            g.settings.fontColour = '#F00';
+            g.settings.highlightedOpacity = 0.4;
+            g.settings.fontColour = '#EAEAEA';
             g.settings.font = 'arial';            
         }
         else
@@ -218,19 +229,32 @@
         
         
         ////////////////////////////////////////////////////////////////
-        //Draw the graph & write the code
+        //Draw the chart & write the code
         ////////////////////////////////////////////////////////////////
-        g.draw();
         
-        code += "//Draw the graph" + "<br>"
+        if (env.debugLevel < 3)
+        {
+            inFunction("graph DRAW");
+            debug(1,"Not going to recurse debug here, for that increase env.debugLevel to 3");
+        }
+        
+        g.draw();
+        if (env.debugLevel < 3)
+        {
+            outFunction("graph DRAW");
+        }
+        code += "//Draw the chart" + "<br>"
         code += "g.draw();";
         
+        debug(1,"Placing the code into on screen div");
         $("#code").html(code);
         
         ////////////////////////////////////////////////////////////////
         //reprettify everything (see http://stackoverflow.com/questions/16127015/how-to-re-apply-prettyprint-after-run-prettify-js-has-been-loaded)
         ////////////////////////////////////////////////////////////////
-        $(".prettyprinted").removeClass("prettyprinted");
+        debug(1,"Removing prettyPrinted class throughout, then running prettyPrint (see http://stackoverflow.com/questions/16127015/how-to-re-apply-prettyprint-after-run-prettify-js-has-been-loaded)")
+        
+        $(".prettyprinted").removeClass("prettyprinted");            
         PR.prettyPrint();
     }
     
