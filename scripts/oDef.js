@@ -31,11 +31,18 @@ function graph(type)
     {
         inFunction("graph init()");
         
-        debug(2,"Generating canvas with random number " + o.settings.randomNumber);
+        debug(1,"Generating canvas with random number " + o.settings.randomNumber);
         o.settings.ctx = makeCanvas("canvas" + o.settings.randomNumber, o.settings.bgCol, o.settings.height, o.settings.width, o.settings.position, o.settings.left, o.settings.top, o.settings.container);
         o.settings.ctx.translate(0.5, 0.5);
         
-        debug(2,"Setting mouse movement catcher");
+        
+        debug(1,"Setting chart ID to canvas"+o.settings.randomNumber);
+        o.id = '#canvas' + o.settings.randomNumber;
+        
+        debug(1,"Adding any classes as per settings");
+        $( "#canvas" + o.settings.randomNumber).addClass(o.settings.addedClasses);
+        
+        debug(1,"Setting mouse movement catcher");
         //On mouse over of this canvas, 
         $( "#canvas" + o.settings.randomNumber).mousemove(function( event )
         {            
@@ -56,7 +63,7 @@ function graph(type)
     // Safely destory
     o.destroy = function()
     {
-        clog("removing #canvas" + o.settings.randomNumber)
+        debug(1,"Removing '#canvas" + o.settings.randomNumber + "'")
         $("#canvas" + o.settings.randomNumber).hide();
         $("#canvas" + o.settings.randomNumber).remove();
     };
@@ -289,10 +296,11 @@ function graph(type)
     {
         inFunction("graph convertTable");
         
+        debug(1,"")
         var table = $(tableSearchString);
 
         table.find('tr').each(function(y)
-        {
+        {            
             var record = '';
             var vals = [];
             $(this).find('td').each(function(x)
@@ -673,7 +681,7 @@ function graph(type)
                 if (o.settings.seriesTypes[0] == types.donut)
                 {
                     //findme
-                    clog("about to stroke")
+                    
                     //g.settings.ctx.stroke();
                 }
             }

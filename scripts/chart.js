@@ -11,6 +11,9 @@
         var settings = $.extend(
         {            
             //General                            
+            drawOnCreate:false,                                     // draw on creation
+            addedClasses:'',                                        // additional classes
+            id:'',
             newObject: true,
             randomNumber: Math.round(Math.random() * 100),          // Random number for the chart ID
             ctx: null,                                              // Context
@@ -101,6 +104,7 @@
         g.convertTable(this);       // import data
         g.settings = settings;
         
+        
         //Set the defaults
         for(var i = 0; i <= g.seriesCount; i++)
         {        
@@ -116,6 +120,15 @@
         
         outFunction("$.fn.jChart");
         
+        if (g.settings.drawOnCreate)
+        {
+            debug(1,"drawOnCreate is true, drawing graph")
+            g.draw();
+        }
+        else
+        {
+            debug(1,"drawOnCreate is false, not drawing graph")
+        }
         //Return the template
         return g;    
     };
@@ -162,6 +175,7 @@ function canvasWrite(ctx, txt, y, x, fontSize, font, color, align)
 
 function makeCanvas(id, bgCol, height, width, position, left, top, container)
 {
+    inFunction("makeCanvas('" + id + "','" + bgCol + "'," + height + "," + width + ",'" + position + "'," + left + "," + top + ",'" + container + "')")
     if (typeof container == 'undefined' || container == 'body' || container == '')
     {
         container = "body";
@@ -173,22 +187,28 @@ function makeCanvas(id, bgCol, height, width, position, left, top, container)
     }
     
     
-    
+    debug(1,"Appending new canvas with id '" + id + "' to container '" + container + "'")
     var toAppend = "<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>";
     
+    debug(1,"Appending   " + toAppend)
     $(container).append(toAppend);
-    //$(container).append("<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>");
+    
+    
     var ctx = getContext(id);
     ctx.clearRect(0, 0, width, height);
-    //drawBox(ctx, "transparent", bgCol, point(0, 0), point(height, width));
-
+    
+    
+    outFunction ("makeCanvas");
     return ctx;
 }
 
 function getContext(id)
 {
+    inFunction("getContext('" + id + "')");
     var canvas = document.getElementById(id); // grab canvas element
-    var ctx = canvas.getContext('2d'); // 2d context of element    
+    
+    var ctx = canvas.getContext('2d'); // 2d context of element
+    outFunction("getContext");
     return ctx;
 }
 

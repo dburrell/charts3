@@ -1,0 +1,18 @@
+The following files ARE used for the jchart package:
+- chart.js
+- common.js
+- conf.js
+- oDef.js
+
+The following files ARE used for the jchart package, but are OPTIONAL (they are seperate themes):
+- net.jCharts.greys.js
+- net.jCharts.sampleTheme.js
+
+
+The following files are used purely for jQuery UI and are *NOT* required for final package.
+- jquery-2.1.3.min.js
+- jquery-ui.min.js
+
+The following files are used by the jcharts.net but are NOT required for final package.
+- prettify.js
+- jcharts.net.js

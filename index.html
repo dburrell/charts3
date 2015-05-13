@@ -1,267 +1,274 @@
-<link href='http://fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>
-<link rel="stylesheet" type="text/css" href="style.css" />
-
-<script src="scripts/jquery-2.1.3.min.js"></script>
-<script src="scripts/conf.js"></script>
-<script src="scripts/common.js"></script>
-
-<script src="scripts/oDef.js"></script>
-<script src="scripts/chart.js"></script>
-<script src="scripts/net.jCharts.sampleTheme.js"></script>
-<script src="scripts/net.jCharts.greys.js"></script>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 
-<script type="text/javascript" src="scripts/prettify.js"></script>
-<link href="prettify.css" type="text/css" rel="stylesheet" />
-
-
-<body onload="prettyPrint()">
+    <!--CSS-->
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>  <!-- Fonts -->
+    <link rel="stylesheet" type="text/css" href="stylesheets/prettify.css" rel="stylesheet" />                              <!-- Prettify -->
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />                  <!-- Architect theme -->
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />                <!-- Architect theme -->
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />                        <!-- Architect theme -->
+    <link rel="stylesheet" type="text/css" href="stylesheets/jcharts.css" media="screen" />                     <!-- jcharts.net specific -->
     
-    <!--Example container div-->
-    <table id="holdingTable" border=0>
-        <tr>
-            <!--DATA ON THE LEFT-->
-            <td width=300px>
-                <!--table with data in to fill the graph-->
-                Sample data:
-                <br>
-                <table id="dataTable">
-                    <tr>
-                        <td></td>
-                        <td><center>Groceries</center></td>
-                        <td><center>Travel</center></td>
-                        <td><center>Entertainment</center></td>
-                    </tr>
-                    <tr>
-                        <td>Alice</td>
-                        <td><center>$40.00</center></td>
-                        <td><center>$20.00</center></td>
-                        <td><center>$40.00</center></td>
-                    </tr>
-                    <tr>
-                        <td>Bob</td>
-                        <td><center>$60.00</center></td>
-                        <td><center>$25.00</center></td>
-                        <td><center>$10.00</center></td>
-                    </tr>
-                    <tr>
-                        <td>Charlie</td>
-                        <td><center>$50.00</center></td>
-                        <td><center>$22.00</center></td>
-                        <td><center>$60.00</center></td> 
-                    </tr>
-                </table>
-                
-               
-            </td>
+    
+    <!--JS-->
+    <script src="scripts/jquery-2.1.3.min.js"></script> <!-- jQuery of course -->
+    <script src="scripts/prettify.js"></script>
 
+    <!-- actual jCharts files -->    
+    <script src="scripts/conf.js"></script>
+    <script src="scripts/common.js"></script>    
+    <script src="scripts/oDef.js"></script>    
+    <script src="scripts/chart.js"></script>
+    
+    <!--Theme js files-->
+    <script src="scripts/net.jCharts.greys.js"></script>
+    <script src="scripts/net.jCharts.sampleTheme.js"></script>
+    
+    <!--For the website jcharts.net-->
+    <script src="scripts/jcharts.net.js"></script>
+    
+    
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>J-Charts: online charting that's simple, free and open</title>
+  </head>
+
+  <body onload="prettyPrint(); writeCode();">
+    <header>
+      <!-- sneaky Header -->
+      <div class="sneakyHeader dbnet"><a href="http://davidburrell.net" target="new">{ davidburrell.net }</a></div>
+    
+      <div class="inner">
+        <h1>J-Charts</h1>
+        <h2 class="hideWhenTiny">online charting that's simple, free and open</h2>        
+        <a href="https://github.com/dburrell/jCharts" target="new" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+
+
+          <!--------------------- Main--------------------->          
+          
+          <p>
             
+            <table id="topIcons">
+              <tr>
+                <td width=33% valign=center>
+                  <img src="images/lines.png" class="topIcon">
+                </td>
+                <td width=33% valign=center>
+                  <object type="image/svg+xml" data="images/infinity.svg" class="topIcon">Your browser does not support SVG</object>                  
+                </td>
+                <td width=33% valign=center>
+                  <img src="images/stopwatch.png" class="topIcon">
+                </td>
+              </tr>
+              <tr>
+                <td valign=top>Visualise your data with beatiful HTML5 animations</td>
+                <td valign=top>Countless configurations through the JavaScript interface</td>
+                <td valign=top>Set up takes less than 2 minutes</td>
+              </tr>
+            </table>
+            <br>
+            <br>Can't wait to get stuck in? <a href="#demo">Try out the live demo!</a>
+          </p>
+          
+          <br>
+          
+
+          <!--------------------- Simple Free and Open--------------------->          
+          <h1>Simple, Free and Open</h1>
+          <p>
+            J-Charts gives you online charting that is <b>simple, free and open.</b><br>
             
-            <!--CHART IN THE MIDDLE -->
-            <td  width=600px>                
-                <div id="container"></div>
-            </td>
-                      
-            <!--CONTROLS ON THE RIGHT -->      
-            <td rowspan=2  width=300px>                 
+          </p>
+          
+
+          <div class="highlight" style="display:none;">
+            <pre><span class="nb">require</span> <span class="s1">'redcarpet'</span>
+            <span class="n">markdown</span> <span class="o">=</span> <span class="no">Redcarpet</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">"Hello World!"</span><span class="p">)</span>
+            <span class="nb">puts</span> <span class="n">markdown</span><span class="o">.</span><span class="n">to_html</span></pre>
+          </div>
+
+          <h2><u>Simple</u>, but powerful</h2>
+          <p>Start with only a couple of lines of code, or <a href="documentation.html">see the documentation</a> for how to set every detail to your liking. (<i>Not into coding?</i> That's OK! Build a chart with our <a href="#demo">live demo</a> and copy straight from there). </p>
+          
+          <h2><u>Free</u>, but not cheap</h2>
+          <p>You will never have to pay a cent but you're still getting a highly configurable product with dozens of possible configurations via the <a href="#demo">live demo</a>, or <b>millions</b> by fine tuning through the built in javascript controls.</p>
+          
+          <h2><u>Open</u> and secure</h2>
+          This is a very important mantra for J-Charts, and revolves around two points:
+          <h3>1) Free under GNU GPL v2</h3>
+          <p>All the code used for this project is available under GNU GPL v2, so:
+          <ul>
+            <li>is completely without cost <b>forever</b></li>
+            <li>is available for personal or professional use</li>
+            <li>can be entirely reviewed inside & out by your IT/IS teams</li>            
+          </ul>
+          <h3>2) Runs client-side</h3>
+          This project runs on pure javascript, so it has access only to data you explicitly provide it. J-Charts is a visualisation tool, <b>not</b> a tool that tries to access your data in any way, nor could it.</p>          
+          
+          <br>
+          <hr>
+          
+          
+        <!--------------------- Current Version --------------------->
+        <h1 id="current">Current Version</h1>
+        The current version of J-Charts is still pre-release while we polish some edges, but it should already work perfectly well in your organisation.        
+        This release includes:<br>
+        <ul>
+          <li>Bar & Stack Charts</li>
+            <ul>
+              <li>Including multiple series</li>
+            </ul>
+            <li>Pie, Donut & Polar Charts</li>
+            <ul>
+              <li>Multiple series for donut</li>
+            </ul>
+          <li>Customisable colour scheme</li>
+          <li>Theme files for preloaded colours/borders/etc</li>
+          <li>Automatic conversion from data tables</li>
+          <li>Function for post-conversion data addition</li>
+          <li>Function for post-conversion data adjustment</li>          
+          <li>Tooltips displaying data for each record or series</li>
+        </ul>
+        <br><br><hr>
+          
+          
+          <!--------------------- Online Demo --------------------->
+          <h1 id="demo">Live Demo</h1>
+          In this demo, we start with a table of data to be converted (this is not a requirement for J-Charts, but is assumed for this demo).<br>
+          <br>This table could be hard coded or filled in by another script, PHP, ASP, etc - it doesn't matter.
+          <br><br>
+          <b>Table with id  'dataTable'</b>:
+          
+          <!--Data Table-->
+          <table id="dataTable">
+            <tr>
+                <td width=25%></td>
+                <td width=25%><center>Groceries</center></td>
+                <td width=25%><center>Travel</center></td>
+                <td width=25%><center>Entertainment</center></td>
+            </tr>
+            <tr>
+                <td>Alice</td>
+                <td><center>$40.00</center></td>
+                <td><center>$20.00</center></td>
+                <td><center>$40.00</center></td>
+            </tr>
+            <tr>
+                <td>Bob</td>
+                <td><center>$60.00</center></td>
+                <td><center>$25.00</center></td>
+                <td><center>$10.00</center></td>
+            </tr>
+            <tr>
+                <td>Charlie</td>
+                <td><center>$50.00</center></td>
+                <td><center>$22.00</center></td>
+                <td><center>$60.00</center></td> 
+            </tr>
+        </table>
+          
+        <br>
+        
+        
+        Now you can set up the chart using the controls below, and see the code generated for you underneath:<br><br>
+          
+        <!--Controls-->
+        <table id="controls" width=100% border=0 align=left>
+          <tr>
+            <td class="controlTD" valign=top width=33%>
                 <b>Chart Type</b><br>
                 <input type="radio" name="chartType" value="DEFAULT" checked=true>Default<br>
                 <input type="radio" name="chartType" value="bar">Bar<br>
                 <input type="radio" name="chartType" value="stackedBar">Stacked Bar<br>
                 <input type="radio" name="chartType" value="pie">Pie<br>
                 <input type="radio" name="chartType" value="donut">Donut<br>
-                <input type="radio" name="chartType" value="polar">Polar<br>
-                
-                
-                <br><br><br><b>Animation Time</b><br>
-                <input type="range" id="animationTimeRange" min="0" max="10" value="7"><br><br>
-                
+                <input type="radio" name="chartType" value="polar">Polar<br>            
+            </td>
+            <td class="controlTD" valign=top width=33%>
                 <b>Tooltip Contents</b><br>
                 <input type="radio" name="tipContent" value="DEFAULT" checked=true>Default<br>
                 <input type="radio" name="tipContent" value="record">Single Value<br>
                 <input type="radio" name="tipContent" value="fullRecord">Full Record<br>
-                <input type="radio" name="tipContent" value="fullSeries">Full Series<br>
-                <br><br>
-                
+                <input type="radio" name="tipContent" value="fullSeries">Full Series<br>            
+            </td>
+            <td class="controlTD" valign=top width=33%>
                 <b>Theme</b><br>
                 <input type="radio" name="themeList" value="net.jCharts.sampleTheme" checked=true>net.jCharts.sampleTheme<br>
                 <input type="radio" name="themeList" value="net.jCharts.greys">net.jCharts.greys<br>
-                <input type="radio" name="themeList" value="noTheme">No theme file - manually adjust<br>
-                
-                <br>
-                <button onclick="writeCode()">Draw</button>
+                <input type="radio" name="themeList" value="noTheme">No theme - manually adjust (example)<br>            
             </td>
-            
-            
-            
-        </tr>
-        <tr>
-            <td></td>
-            <!-- DYNAMIC CODE -->
-            <td valign=top colspan=1>
-                <br>Code:
-                <pre id="code" class="prettyprint"></pre>
+          </tr>
+          <tr>
+            <td class="controlTD" valign=middle>
+                <b>Animation Time</b><br>
+                <input type="range" id="animationTimeRange" min="0" max="10" value="7">
             </td>
+            <td class="controlTD" valign=middle align=center> </td>
             <td></td>
-        </tr>
-    </table>
+          </tr>                  
+        </table>
+        <center><button onclick="writeCode()">Draw</button></center>
+        <!-- the chart -->
+        <div id="container"></div>     
     
-    
-   <a href="https://github.com/dburrell/jCharts" target="new"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/567c3a48d796e2fc06ea80409cc9dd82bf714434/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png"></a>
-    <div id="footer"></div>
-    <div class="footerLink"><a href="http://davidburrell.net" target="new">{ davidburrell.net }</a></div>
-    
-</body>
-<script>
-    var g = null;
+        <!-- code -->
+        The chart above was generated with this code:
+        <pre id="codeGen" class="prettyprint linenums"></pre>
+          
+        <br><br>
+        <hr>
+        
+        
+        
+        
+        <!--------------------- About the developer --------------------->
+        <h1>About the developer</h1>
+        bippity boppity boop.
+        <!--<p>David Burrell has provided technical systems supporting several of the largest corporations on the planet.</p>-->
       
-    writeCode();
+      </section>
+
+
+
+
+
+
+        <!-- Side Bar-->
+        <aside id="sidebar">
+          <a href="https://github.com/dburrell/jCharts/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/dburrell/jCharts/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+          <p class="repo-owner"><a href="https://github.com/dburrell/jCharts"  target="new" >J-Charts</a> is maintained by <a href="https://github.com/dburrell"  target="new" >dburrell</a>.</p><br>          
+          <p class="creditDue">This page is originally designed from the <a href="https://pages.github.com"  target="new" >GitHub Pages</a> Architect theme by <a href="https://twitter.com/jasonlong"  target="new" >Jason Long</a>.</p>
+        </aside>
+
+        
+        
+      </div>
+    </div>
+
+    <!--Fork me!-->
+    <a href="https://github.com/dburrell/jCharts" target="new" class="hideSmall"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/567c3a48d796e2fc06ea80409cc9dd82bf714434/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png"></a>
     
-    function writeCode()
-    {
-        debug(1,"Generating graph & applying properties as set by UI")
-        var code = "";
-        
-        ////////////////////////////////////////////////////////////////
-        //Create the new chart object
-        ////////////////////////////////////////////////////////////////
-        code += "//Make the chart object using data from the table" + "<br>"
-        code += "var g = $('#dataTable').jChart({width:300});" + "<br><br>";
-        if (g != null)
-        {
-            g.destroy();    
-        }        
-        g = $('#dataTable').jChart({width:300});
-        
-        
-        ////////////////////////////////////////////////////////////////
-        //Set position
-        ////////////////////////////////////////////////////////////////
-        code += "//Set parent object (optional, otherwise chart will be set to position:absolute)" + "<br>"
-        code += "g.setContainer('container');   //e.g. object with id 'container'" + "<br><br>";        
-        
-        g.setContainer('container');
-        
-        
-        
-        ////////////////////////////////////////////////////////////////
-        //Set type
-        ////////////////////////////////////////////////////////////////
-        var seriesType = $("input[name=chartType]:checked").val();
-        if (seriesType != "DEFAULT")
-        {
-            code += "//Set the chart type" + "<br>"
-            code += "g.setChartType(types." + seriesType + ")  " + "<br><br>";
-            
-            g.setChartType(types[seriesType]);                
-        }
-        
-        
-        
-        
-        ////////////////////////////////////////////////////////////////
-        //Set animation speed
-        ////////////////////////////////////////////////////////////////
-        var animationTime = $("#animationTimeRange")[0].value;                
-        code += "//Set the animation time (optional)" + "<br>"
-        code += "g.setAnimationTime(" + (animationTime * 100) + ")";
-        
-        if (animationTime > 0)
-        {
-            code += "  // animation will take " + (animationTime * 100) + " ms" + "<br><br>";            
-        }
-        else
-        {
-            code += "  // animation will be disabled" + "<br><br>";
-        }
-        g.setAnimationTime(animationTime*100);          
-        
-        
-        ////////////////////////////////////////////////////////////////
-        //Set tooltip contents
-        ////////////////////////////////////////////////////////////////
-        var tipContents = $("input[name=tipContent]:checked").val();
-        
-        if (tipContents != "DEFAULT")
-        {
-            code += "//Set the tooltip content" + "<br>"
-            code += "g.setToolTipContents(toolTipContentTypes." + tipContents + ")  " + "<br><br>";
-            
-            g.setToolTipContents(toolTipContentTypes[tipContents]);            
-        }
-        
-        
-        
-        ////////////////////////////////////////////////////////////////
-        //Set theme
-        ////////////////////////////////////////////////////////////////
-        var theme = $("input[name=themeList]:checked").val();
-        
-        if (theme == "noTheme")
-        {
-            code += "//Don't set a theme, set details manually" + "<br>"
-            code += "g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f']; " + "<br>";
-            code += "g.settings.lineColor = #777;" + "<br>";
-            code += "g.settings.lineWidth = 0;" + "<br>";
-            code += "g.settings.defaultOpacity = 1;" + "<br>";
-            code += "g.settings.highlightedOpacity = 0.4;" + "<br>";
-            code += "g.settings.fontColour = '#000';" + "<br>";
-            code += "g.settings.font = 'arial';" + "<br>";
-            code += "<br>";
-            
-            g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f'];
-            
-            g.settings.lineColor = '#777';
-            g.settings.lineWidth = 0;
-    
-            g.settings.defaultOpacity = 1;
-            g.settings.highlightedOpacity = 0.4;
-            g.settings.fontColour = '#EAEAEA';
-            g.settings.font = 'arial';            
-        }
-        else
-        {
-            code += "//Set the theme from file.<br>//This assumes your html has a script tag with src '" + theme + ".js'" + "<br>"
-            code += "g.setTheme('" + theme + "');  " + "<br><br>";
-            
-            g.setTheme(theme, 'scripts');
-        }
-        
-        
-        ////////////////////////////////////////////////////////////////
-        //Draw the chart & write the code
-        ////////////////////////////////////////////////////////////////
-        
-        if (env.debugLevel < 3)
-        {
-            inFunction("graph DRAW");
-            debug(1,"Not going to recurse debug here, for that increase env.debugLevel to 3");
-        }
-        
-        g.draw();
-        if (env.debugLevel < 3)
-        {
-            outFunction("graph DRAW");
-        }
-        code += "//Draw the chart" + "<br>"
-        code += "g.draw();";
-        
-        debug(1,"Placing the code into on screen div");
-        $("#code").html(code);
-        
-        ////////////////////////////////////////////////////////////////
-        //reprettify everything (see http://stackoverflow.com/questions/16127015/how-to-re-apply-prettyprint-after-run-prettify-js-has-been-loaded)
-        ////////////////////////////////////////////////////////////////
-        debug(1,"Removing prettyPrinted class throughout, then running prettyPrint (see http://stackoverflow.com/questions/16127015/how-to-re-apply-prettyprint-after-run-prettify-js-has-been-loaded)")
-        
-        $(".prettyprinted").removeClass("prettyprinted");            
-        PR.prettyPrint();
-    }
-    
-    
-    
-    
-    
-    
-    
-</script>
+    <!-- footer -->
+    <div class="footer dbnet"><a href="http://davidburrell.net" target="new">{ davidburrell.net }</a></div>
+  </body>
+</html>

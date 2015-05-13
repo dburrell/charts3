@@ -1,0 +1,348 @@
+<link href='http://fonts.googleapis.com/css?family=Roboto:400,300|Architects+Daughter' rel='stylesheet' type='text/css'>
+
+<link rel="stylesheet" type="text/css" href="style.css" />
+
+<script src="scripts/jquery-2.1.3.min.js"></script>
+<script src="scripts/conf.js"></script>
+<script src="scripts/common.js"></script>
+<script src="scripts/oDef.js"></script>
+<script src="scripts/chart.js"></script>
+<script src="scripts/net.jCharts.sampleTheme.js"></script>
+<script src="scripts/net.jCharts.greys.js"></script>
+<script type="text/javascript" src="scripts/prettify.js"></script>
+
+<script src="scripts/jquery-ui.min.js"></script>
+
+
+<link href="stylesheets/prettify.css" type="text/css" rel="stylesheet" />
+<link href="stylesheets/jquery-ui.css" type="text/css" rel="stylesheet" />
+<link href="stylesheets/jquery-ui.theme.min.css" type="text/css" rel="stylesheet" />
+<link href="stylesheets/jquery-ui.structure.min.css" type="text/css" rel="stylesheet" />
+
+
+
+<body onload="prettyPrint()">
+    
+    <header>
+        <div class="inner">
+            <h1>Jcharts</h1>
+            <h2>online charting that's simple, free and open</h2>
+            <a href="https://github.com/dburrell/jCharts" class="button"><small>View project on</small> GitHub</a>
+            
+        </div>
+    </header>
+    <!--Example container div-->
+    <table id="holdingTable" border=0>
+        <tr>
+            <td></td>
+            <td class="middleCol">
+                <!-- static content, above graph-->
+                dsadsadas
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <!--DATA ON THE LEFT-->
+            <td width=300px rowspan=4>
+                
+            </td>
+
+            
+            
+            <!--CHART IN THE MIDDLE -->
+            <td width=750px  class="middleCol">
+                <table>
+                    <tr>
+                        <td>
+                            <div id="container"></div>            
+                        </td>
+                        <td>
+                            <table id="dataTable">
+                                <tr>
+                                    <td></td>
+                                    <td><center>Groceries</center></td>
+                                    <td><center>Travel</center></td>
+                                    <td><center>Entertainment</center></td>
+                                </tr>
+                                <tr>
+                                    <td>Alice</td>
+                                    <td><center>$40.00</center></td>
+                                    <td><center>$20.00</center></td>
+                                    <td><center>$40.00</center></td>
+                                </tr>
+                                <tr>
+                                    <td>Bob</td>
+                                    <td><center>$60.00</center></td>
+                                    <td><center>$25.00</center></td>
+                                    <td><center>$10.00</center></td>
+                                </tr>
+                                <tr>
+                                    <td>Charlie</td>
+                                    <td><center>$50.00</center></td>
+                                    <td><center>$22.00</center></td>
+                                    <td><center>$60.00</center></td> 
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                
+            </td>
+                      
+            <!--RIGHT -->      
+            <td rowspan=3  width=300px class="rightCol" valign=top>                 
+               <a href="https://github.com/dburrell/jCharts/zipball/master" class="button">            <small>Download</small>            .zip file          </a>
+               <a href="https://github.com/dburrell/jCharts/tarball/master" class="button">            <small>Download</small>            .tar.gz file          </a>
+            </td>
+            
+            
+            
+        </tr>
+        <tr>
+            <!--Control middle-->
+            
+            <td>
+                <table id="controls" width=100% border=0>
+                    <tr>
+                        <td valign=top width=33%>
+                            <b>Chart Type</b><br>
+                            <input type="radio" name="chartType" value="DEFAULT" checked=true>Default<br>
+                            <input type="radio" name="chartType" value="bar">Bar<br>
+                            <input type="radio" name="chartType" value="stackedBar">Stacked Bar<br>
+                            <input type="radio" name="chartType" value="pie">Pie<br>
+                            <input type="radio" name="chartType" value="donut">Donut<br>
+                            <input type="radio" name="chartType" value="polar">Polar<br>            
+                        </td>
+                        <td valign=top width=33%>
+                            <b>Tooltip Contents</b><br>
+                            <input type="radio" name="tipContent" value="DEFAULT" checked=true>Default<br>
+                            <input type="radio" name="tipContent" value="record">Single Value<br>
+                            <input type="radio" name="tipContent" value="fullRecord">Full Record<br>
+                            <input type="radio" name="tipContent" value="fullSeries">Full Series<br>            
+                        </td>
+                        <td valign=top width=33%>
+                            <b>Theme</b><br>
+                            <input type="radio" name="themeList" value="net.jCharts.sampleTheme" checked=true>net.jCharts.sampleTheme<br>
+                            <input type="radio" name="themeList" value="net.jCharts.greys">net.jCharts.greys<br>
+                            <input type="radio" name="themeList" value="noTheme">No theme file - manually adjust<br>            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign=middle>
+                            <b>Animation Time</b><br>
+                            <input type="range" id="animationTimeRange" min="0" max="10" value="7"><br><br>
+                        </td>
+                        <td valign=middle align=center> <button onclick="writeCode()">Draw</button></td>
+                        <td></td>
+                    </tr>
+                </table>
+                
+                
+            </td>
+            
+        </tr>
+        <tr>
+            
+            <td>
+                <div id="tabs">
+                    <ul>
+                      <li><a href="#tabs-1">Code</a></li>
+                      <li><a href="#tabs-2">Log</a></li>
+                      <li><a href="#tabs-3">3rd</a></li>
+                    </ul>
+                    <div id="tabs-1">
+                      <p>
+                        <pre id="code" class="prettyprint"></pre>
+                        
+                      </p>
+                    </div>
+                    <div id="tabs-2">
+                      <p>Morbi tincidunt, dui sit amet facilisis feugiat, odio metus gravida ante, ut pharetra massa metus id nunc. Duis scelerisque molestie turpis. Sed fringilla, massa eget luctus malesuada, metus eros molestie lectus, ut tempus eros massa ut dolor. Aenean aliquet fringilla sem. Suspendisse sed ligula in ligula suscipit aliquam. Praesent in eros vestibulum mi adipiscing adipiscing. Morbi facilisis. Curabitur ornare consequat nunc. Aenean vel metus. Ut posuere viverra nulla. Aliquam erat volutpat. Pellentesque convallis. Maecenas feugiat, tellus pellentesque pretium posuere, felis lorem euismod felis, eu ornare leo nisi vel felis. Mauris consectetur tortor et purus.</p>
+                    </div>
+                    <div id="tabs-3">
+                      <p>Mauris eleifend est et turpis. Duis id erat. Suspendisse potenti. Aliquam vulputate, pede vel vehicula accumsan, mi neque rutrum erat, eu congue orci lorem eget lorem. Vestibulum non ante. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Fusce sodales. Quisque eu urna vel enim commodo pellentesque. Praesent eu risus hendrerit ligula tempus pretium. Curabitur lorem enim, pretium nec, feugiat nec, luctus a, lacus.</p>
+                      <p>Duis cursus. Maecenas ligula eros, blandit nec, pharetra at, semper at, magna. Nullam ac lacus. Nulla facilisi. Praesent viverra justo vitae neque. Praesent blandit adipiscing velit. Suspendisse potenti. Donec mattis, pede vel pharetra blandit, magna ligula faucibus eros, id euismod lacus dolor eget odio. Nam scelerisque. Donec non libero sed nulla mattis commodo. Ut sagittis. Donec nisi lectus, feugiat porttitor, tempor ac, tempor vitae, pede. Aenean vehicula velit eu tellus interdum rutrum. Maecenas commodo. Pellentesque nec elit. Fusce in lacus. Vivamus a libero vitae lectus hendrerit hendrerit.</p>
+                    </div>
+              </div>    
+            </td>
+            
+        </tr>
+    </table>
+    
+    
+    
+    
+   <a href="https://github.com/dburrell/jCharts" target="new"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/567c3a48d796e2fc06ea80409cc9dd82bf714434/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png"></a>
+    <div id="footer"></div>
+    <div class="footerLink"><a href="http://davidburrell.net" target="new">{ davidburrell.net }</a></div>
+    
+</body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+    
+    $( "#tabs" ).tabs();
+    
+    var g = null;
+      
+    //writeCode();
+    
+    function writeCode()
+    {
+        inFunction("writeCode()");
+        debug(1,"Generating graph & applying properties as set by UI")
+        var code = "";
+        
+        ////////////////////////////////////////////////////////////////
+        //Create the new chart object
+        ////////////////////////////////////////////////////////////////
+        code += "var g = $('#dataTable').jChart({width:300}); //Make chart from table, can override defaults" + "<br><br>";
+        if (g != null)
+        {
+            g.destroy();    
+        }        
+        g = $('#dataTable').jChart({width:300});
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Set position
+        ////////////////////////////////////////////////////////////////
+        code += "g.setContainer('container');   //Set parent object (optional)" + "<br><br>";        
+        
+        g.setContainer('container');
+        
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Set type
+        ////////////////////////////////////////////////////////////////
+        var seriesType = $("input[name=chartType]:checked").val();
+        if (seriesType != "DEFAULT")
+        {
+            code += "//Set the chart type" + "<br>"
+            code += "g.setChartType(types." + seriesType + ")  " + "<br><br>";
+            
+            g.setChartType(types[seriesType]);                
+        }
+        
+        
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Set animation speed
+        ////////////////////////////////////////////////////////////////
+        var animationTime = $("#animationTimeRange")[0].value;                
+        
+        code += "g.setAnimationTime(" + (animationTime * 100) + ")";
+        
+        if (animationTime > 0)
+        {
+            code += "  //Animation will take " + (animationTime * 100) + " ms" + "<br><br>";            
+        }
+        else
+        {
+            code += "  //Animation will be disabled" + "<br><br>";
+        }
+        g.setAnimationTime(animationTime*100);          
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Set tooltip contents
+        ////////////////////////////////////////////////////////////////
+        var tipContents = $("input[name=tipContent]:checked").val();
+        
+        if (tipContents != "DEFAULT")
+        {
+            
+            code += "g.setToolTipContents(toolTipContentTypes." + tipContents + "); //Set the tooltip content  " + "<br><br>";
+            
+            g.setToolTipContents(toolTipContentTypes[tipContents]);            
+        }
+        
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Set theme
+        ////////////////////////////////////////////////////////////////
+        var theme = $("input[name=themeList]:checked").val();
+        
+        if (theme == "noTheme")
+        {
+            code += "//Don't set a theme, set details manually" + "<br>"
+            code += "g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f']; " + "<br>";
+            code += "g.settings.lineColor = #777;" + "<br>";
+            code += "g.settings.lineWidth = 0;" + "<br>";
+            code += "g.settings.defaultOpacity = 1;" + "<br>";
+            code += "g.settings.highlightedOpacity = 0.4;" + "<br>";
+            code += "g.settings.fontColour = '#111';" + "<br>";
+            code += "g.settings.font = 'arial';" + "<br>";
+            code += "<br>";
+            
+            g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f'];
+            
+            g.settings.lineColor = '#777';
+            g.settings.lineWidth = 0;
+    
+            g.settings.defaultOpacity = 1;
+            g.settings.highlightedOpacity = 0.4;
+            g.settings.fontColour = '#111';
+            g.settings.font = 'arial';            
+        }
+        else
+        {            
+            code += "g.setTheme('" + theme + "');  //Set the theme from js file." + "<br><br>";
+            
+            g.setTheme(theme, 'scripts');
+        }
+        
+        
+        ////////////////////////////////////////////////////////////////
+        //Draw the chart & write the code
+        ////////////////////////////////////////////////////////////////
+        
+        if (env.debugLevel < 3)
+        {
+            inFunction("graph DRAW");
+            debug(1,"Not going to recurse debug here, for that increase env.debugLevel to 3");
+        }
+        
+        g.draw();
+        if (env.debugLevel < 3)
+        {
+            outFunction("graph DRAW");
+        }
+        //code += "//Draw the chart" + "<br>"
+        code += "g.draw();  //Draw the chart";
+        
+        debug(1,"Placing code into div onscreen");
+        $("#code").html(code);
+        
+        ////////////////////////////////////////////////////////////////
+        //reprettify everything (see http://stackoverflow.com/questions/16127015/how-to-re-apply-prettyprint-after-run-prettify-js-has-been-loaded)
+        ////////////////////////////////////////////////////////////////
+        debug(1,"Prettying up html")
+        
+        $(".prettyprinted").removeClass("prettyprinted");            
+        PR.prettyPrint();
+        $(".prettyprinted").css("borderWidth",0);
+        outFunction("writeCode()");
+    }
+    
+    
+    
+    
+    
+    
+    
+</script>

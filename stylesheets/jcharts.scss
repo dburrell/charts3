@@ -1,0 +1,134 @@
+// This file is a non-compiled version of the css file jcharts.css which is actually referenced by the html.
+// Conversion is done by Koala.
+
+
+
+.dbnet
+{
+    height:20px;
+    font-size:10px;
+    text-align:right;
+    margin-right:10px;
+}
+
+.dbnet a, .dbnet a:visited
+{
+    font-family:arial;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+.sneakyHeader
+{
+    position:absolute;
+    right:0px;
+    top:0px;
+    
+}
+
+.footer
+{
+    position:relative;
+    right:0px;
+    bottom:0px;    
+}
+
+.sneakyHeader a, .sneakyHeader a:visited { color:#DBDBDB; }
+.footer a, .footer a:visited { color:#3a3a3a; }
+
+// Credit due to the architect theme
+.creditDue
+{
+    color:#888;
+    font-size:10px;
+}
+.creditDue a
+{
+    color:#88B;
+}
+
+
+//Data table
+#dataTable, #dataTable td
+{
+    width:250px;
+    border-width:1px;
+    font-size:12px;
+    color:#777;
+    border-color:#ccc;
+    border-style:solid;
+    cell-spacing:0;
+    padding-top:1;
+    padding-bottom:1;
+    padding-left: 5;
+    padding-right:5;
+    border-collapse: collapse;
+}
+
+#controls
+{
+    border-width:0;
+}
+.controlTD
+{
+    font-size:12px;
+    text-align:left;    
+}
+
+#container
+{
+    text-align:center;
+}
+
+#codeGen
+{
+    border: 2px solid #F00;
+    border-width:2px;
+    border-color:#000;
+    border-style: solid;
+    font-size:12px;
+    width:100%;
+}
+
+#topIcons tr td
+{
+    text-align:center;
+}
+
+#topIcons
+{
+    border:0 solid #fff;
+}
+
+#topIcons tbody tr td
+{
+    border:0 solid #fff;
+}
+
+.topIcon
+{
+    width:80px;    
+}
+
+
+
+//Small version - hides the forking
+@media screen and (max-width: 870px)
+{
+    .hideSmall
+    {
+        display:none;
+    }    
+}
+
+//Tiny version - hides the tagline
+@media screen and (max-width: 535px)
+{
+    .hideWhenTiny
+    {
+        display:none;
+    }
+}
+
+
+.prettyprint ol.linenums > li { list-style-type: decimal; }

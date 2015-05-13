@@ -24,7 +24,7 @@ The most straight forwards usage is to simply give it a table of data to work wi
 
 You could then use this code:
 ```sh
-var g = $("#dataTable").jChart();   //Make a chart out of the data stored in a table with ID of 'dataTable'
+var g = $("#dataTable").jChart();   // Automatically convert the table
 ```
 
 There are then various adjustments that can be made to the data afterwards if required:
@@ -36,6 +36,12 @@ g.addRecord("Charlie",[80,23,70]);   // add a whole new record (with optional va
 g.set("Alice","Chemistry",85);       // adjust the (currently null) value of Alice's Chemistry score
 g.set("Bob","Chemistry",88);         // adjust the (currently null) value of Bob's Chemistry score
 ```
+
+
+Theme
+----
+It should be noted that the website theme for jcharts.net is based on Jason Long's architect theme (https://github.com/jasonlong/architect-theme) released under creative commons. This is *not* used within the main Jcharts package.
+
 
 License
 ----
