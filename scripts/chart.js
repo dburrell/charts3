@@ -20,6 +20,10 @@
             cols: -1,                                               // Number of columns per series            
             position: 'absolute',                                   // CSS Positioning of the canvas
             
+            //Data handling
+            stacked:true,                                           //Stack values?            
+            inverseData: false,
+            
             //Colouring
             font: "'Titillium Web', sans-serif",                    // Font face
             fontColour: '#888',                                      // Font colour
@@ -34,7 +38,7 @@
             //Positioning
             top: 0,                                                 // Top Position (CSS)
             left: 0,                                                // Left Position (CSS)
-            width: 300,                                             // Width of canvas
+            width: 400,                                             // Width of canvas
             height: 300,                                            // Height of canvas
             margin: 40,                                             // Margin around drawarea
             container: '',                                          // parent object - leave blank to make position absolute
@@ -67,6 +71,7 @@
             highlightedOpacity:0.2,
             lineColor:'#EAEAEA',
             lineWidth:3,
+
             
             //Bar chart specifics
             gap: 10,
@@ -77,7 +82,7 @@
             shadeUnderLine: true,
                            
             //Scatter graph specifics           
-            dotFill: '#eaeaea',
+            lines:true,
             
             //Pie specifics
             
@@ -86,7 +91,7 @@
             
             //Types
             seriesTypes: [],            
-            defaultType: types.stackedBar
+            defaultType: types.bar
             
                         
         }, options);
@@ -101,7 +106,7 @@
         //make a graph object
         /////////////////////////     
         var g = graph();            // make an object
-        g.convertTable(this);       // import data
+        g.convertTable(settings,this);       // import data
         g.settings = settings;
         
         
@@ -188,7 +193,7 @@ function makeCanvas(id, bgCol, height, width, position, left, top, container)
     
     
     debug(1,"Appending new canvas with id '" + id + "' to container '" + container + "'")
-    var toAppend = "<canvas id='" + id + "' style='position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>";
+    var toAppend = "<canvas id='" + id + "' style='background:" + bgCol + "; position:" + position + "; top:" + top + "px; left:" + left + "px;  ' height=" + height + "px width=" + width + "px></canvas>";
     
     debug(1,"Appending   " + toAppend)
     $(container).append(toAppend);

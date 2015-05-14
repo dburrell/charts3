@@ -18,8 +18,10 @@
     theme.colours[6] = '#1abc9c';
     theme.colours[7] = '#f1c40f';
     
-    //Object line
-    theme.lineColor = '#EAEAEA';
+    //Background color
+    theme.bgCol = 'transparent';
+    
+    //For scatter type
     theme.lineWidth = 1;
     
     //Opacities

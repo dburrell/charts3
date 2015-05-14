@@ -191,6 +191,12 @@ function graph(type)
         return val;
     };
     
+    //Set values to stacked
+    o.setStackedValues = function(trueOrFalse)
+    {
+        o.settings.stacked = trueOrFalse;
+    }
+    
     //Set a different series type
     o.setSeriesType = function(i,n)
     {
@@ -292,23 +298,52 @@ function graph(type)
     };
     
     //Import data from a table
-    o.convertTable = function(tableSearchString)
+    o.convertTable = function(settings,tableSearchString)
     {
+        
         inFunction("graph convertTable");
         
         debug(1,"")
         var table = $(tableSearchString);
-
+        
+        //pull data into a 2d data array
+        var data = array2d();
+        var y = 0;
+        var x = 0;
+        var maxY = 0;
+        var maxX = 0;
+        
+        debug(1,"Adding data to 2d data array");
         table.find('tr').each(function(y)
-        {            
-            var record = '';
-            var vals = [];
+        {                        
             $(this).find('td').each(function(x)
             {
+                //findme
                 var val = $(this).text();
+                data.set(x,y,val);
+                x++;
+                maxX = x;
+            });        
+            y++;
+            maxY = y;
+        });        
+        
+        debug(1,"Looping 2d array")
+        for (var y = 0; y < maxY; y++)
+        {
+            
+            var record = '';
+            var vals = [];
+            for (var x = 0; x < maxX; x++)
+            {
+                var val = data.get(x,y);
+                if (settings.inverseData)
+                {                    
+                    val = data.get(y,x);
+                }
                 if (x == 0)
                 {
-                    record = val;
+                    record = val;                    
                 }
                 else
                 {
@@ -320,15 +355,13 @@ function graph(type)
                     {
                         vals[x - 1] = val;
                     }
-
                 }
-            });
+            }
 
             
             if (y == 0)
             {
-                //Add the series collection
-                debug(1,"Adding series headers")
+                //Add the series collection                
                 for (var i = 1; i < vals.length; i++)
                 {                    
                     o.addSeries(vals[i]);
@@ -341,8 +374,55 @@ function graph(type)
                 //Add a new record                
                 o.addRecord(record, vals);
             }
-        });
+        };
         
+        if (false)
+        {
+                
+            
+            table.find('tr').each(function(y)
+            {            
+                var record = '';
+                var vals = [];
+                $(this).find('td').each(function(x)
+                {
+                    var val = $(this).text();
+                    if (x == 0)
+                    {
+                        record = val;
+                    }
+                    else
+                    {
+                        if (y == 0)
+                        {
+                            vals[x] = val;
+                        }
+                        else
+                        {
+                            vals[x - 1] = val;
+                        }
+                    }
+                });
+    
+                
+                if (y == 0)
+                {
+                    //Add the series collection
+                    debug(1,"Adding series headers")
+                    for (var i = 1; i < vals.length; i++)
+                    {                    
+                        o.addSeries(vals[i]);
+                    }
+                    
+                }
+                else
+                {
+                    debug(1,"Adding row " + y)
+                    //Add a new record                
+                    o.addRecord(record, vals);
+                }
+            });
+        }
         outFunction("graph convertTable");
     };
 
@@ -375,8 +455,7 @@ function graph(type)
             wipeCanvas("canvas" + o.settings.randomNumber);
 
             //Add borders and axis settings etc
-            if (o.settings.seriesTypes[0] == types.bar
-                || o.settings.seriesTypes[0] == types.stackedBar
+            if (o.settings.seriesTypes[0] == types.bar                
                 || o.settings.seriesTypes[0] == types.line
                 || o.settings.seriesTypes[0] == types.scatter)
             {
@@ -410,7 +489,7 @@ function graph(type)
                         val = Math.max(Number(o.get(o.records[r], o.series[s])), val);  // either taking highest rolling
                         var valToStack = Number(o.get(o.records[r], o.series[s]));      // or for stacking, add the current
                         
-                        if (o.settings.seriesTypes[s] == types.stackedBar)
+                        if (o.settings.stacked)
                         {
                             stackVal += valToStack;                        
                         }
@@ -482,12 +561,14 @@ function graph(type)
                     {
                         barShifts[series] = totalBarCount;
                         totalBarCount ++;
-                    }
-                    if (o.settings.seriesTypes[series] == types.stackedBar && stackCounted == 0)
-                    {
-                        barShifts[series] = totalBarCount;
-                        stackCounted = 1;
-                        totalBarCount ++;
+                                    
+                        //This only applies to bar; non-stacked scatters still occur in the same x-space
+                        if (o.settings.stacked && stackCounted == 0)
+                        {
+                            barShifts[series] = totalBarCount;
+                            stackCounted = 1;
+                            totalBarCount ++;
+                        }
                     }
                 }
                 
@@ -554,39 +635,26 @@ function graph(type)
                         ///////////////////////////////////////////
                         if (o.settings.seriesTypes[series] == types.bar)
                         {
+                    
+                            var stackOffset = 0;    // for debugging, should be 0 in general
+                            
                             var width = barWidth/totalBarCount;  //the actual width of each bar - barWidth will be used 
                             var p1 = point(o.settings.height - o.settings.margin, (barShifts[series] * width) + (o.settings.margin + ((barWidth * record)) + (o.settings.gap * (record + 1))));
-                            var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (barShifts[series]* width) + (o.settings.margin + (barWidth * record)) + ((o.settings.gap * (record + 1)) + width) );
-                            var id = (o.recordCount*series) + record;
-                            id = o.objects.count;                            
-                            var newObject = barObject(o.settings, series, p1, p2, id, series, record);
+                            var p2 = point((o.settings.height - o.settings.margin) - (val * valRatio), (barShifts[series]* width) + (o.settings.margin + (barWidth * record)) + ((o.settings.gap * (record + 1)) + width) );                                
                             
-                            o.objects.add(newObject);
-                            barCount++;
-                        }
-                        
-                        ///////////////////////////////////////////
-                        //stacked barchart version
-                        ///////////////////////////////////////////
-                        if (o.settings.seriesTypes[series] == types.stackedBar)
-                        {
-                            var stackOffset = 0;    // for debugging, should be 0 in general
-                            var p1 = point((o.settings.height - o.settings.margin) - stackLevels[record], (o.settings.margin + (barWidth * record) + (o.settings.gap * (record + 1))) + stackCount * stackOffset );
-                            var p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[record], (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth + stackCount * stackOffset);
+                            if (o.settings.stacked)
+                            {                                
+                                p1 = point((o.settings.height - o.settings.margin) - stackLevels[record], (o.settings.margin + (barWidth * record) + (o.settings.gap * (record + 1))) + stackCount * stackOffset );
+                                p2 = point(((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[record], (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth + stackCount * stackOffset);                            
+                            }
+                            
                             var id = (o.recordCount*series) + record;
                             id = o.objects.count;
                             var newObject = barObject(o.settings, series, p1, p2, id, series, record);
                             o.objects.add(newObject);
-                            
-                            //Stack specifics
-                            stackLevels[record] += (val * valRatio);         // The next stacked bar in this record will start from here
-                            stackCount++;                               // The next stacked bar will shift over by 1
-                            if (stackCount == 0)
-                            {
-                                barCount++;
-                            }
+                            barCount++;
                         }
-
+            
                         ///////////////////////////////////////////
                         //line version
                         ///////////////////////////////////////////
@@ -609,13 +677,28 @@ function graph(type)
                         ///////////////////////////////////////////
                         if (o.settings.seriesTypes[series] == types.scatter)
                         {
+                            
                             var y = (o.settings.height - o.settings.margin) - (val * valRatio);
+                            if (o.settings.stacked)
+                            {
+                                y = ((o.settings.height - o.settings.margin) - (val * valRatio)) - stackLevels[record];
+                            }
+                            
                             var x = (o.settings.margin + (barWidth * record)) + (o.settings.gap * (record + 1)) + barWidth / 2;
                             var newPoint = point(y, x);
                             var id = (o.recordCount*series) + record;
                             id = o.objects.count;
-                            var newObject = dotObject(o.settings, i, newPoint, id, series, record);
+                            
+                            var newObject = dotObject(o.settings, i, oldPoint, newPoint, id, series, record);
                             o.objects.add(newObject);
+                            
+                            
+                            if (oldPoint != null)
+                            {
+                                var newObjectLine = lineObject(o.settings,i,oldPoint,newPoint,id,series,record);
+                                o.objects.add(newObjectLine);
+                            }
+                            oldPoint = newPoint;
                         }
 
                         ///////////////////////////////////////////
@@ -664,16 +747,24 @@ function graph(type)
                             }
                         }
                         
+                        
+                        if (o.settings.stacked)
+                        {
+                            //Stack tracking
+                            stackLevels[record] += (val * valRatio);         // The next stacked bar in this record will start from here
+                            stackCount++;                               // The next stacked bar will shift over by 1
+                            if (stackCount == 0)
+                            {
+                                barCount++;
+                            }   
+                        }
+                        
 
                         //Push new point into old point
                         oldPoint = newPoint;
 
                         counter++;
                     }
-
-                    
-                    
-                    
                 }
                 
                 //Draw all the objects
@@ -965,13 +1056,12 @@ function array2d()
 //Types of chart for each series
  var types = $.extend(
  {
-     bar: 1,
-     stackedBar: 2,
-     line: 3,
-     scatter: 4,
-     pie:5,
-     donut:6,
-     polar:7
+     bar: 1,     
+     line: 2,
+     scatter: 3,
+     pie: 4,
+     donut: 5,
+     polar: 6
  });
 
 //Horizontal Alignment
@@ -989,7 +1079,13 @@ function array2d()
      fullSeries: 3     
  });
 
-
+//Types line options
+ var lineType = $.extend(
+ {
+     none: 1,     
+     line: 2,
+     curve: 3     
+ });
 
 
 ///////////////////////////////////////////
@@ -1208,6 +1304,7 @@ function pieSliceObject(g, i, sAngle, eAngle, id, val, donut, polar, series, rec
 //Line object template
 function lineObject(settings, i, p1, p2, id, series, record)
 {
+    
     var o = {};
     o.p1 = p1;
     o.p2 = p2;
@@ -1217,49 +1314,61 @@ function lineObject(settings, i, p1, p2, id, series, record)
     o.id = id;
     o.draw = function()
     {        
-        drawLine(settings.ctx, lineCol, settings.lineWidth, p1, p2);
-    };    
+        drawLine(settings.ctx, settings.colours[series], settings.lineWidth, p1, p2);
+    };
+    
+    o.touching = function(y,x)
+    {
+        return false;
+    }
+
     return o;
+
 }
 
 //Dot object template
-function dotObject(settings, i, p, id, series, record)
+function dotObject(settings, i, oldPoint, p, id, series, record)
 {
+    var lines = settings.lines;
     var o = {};
     o.p1 = p;
     o.drawOrder = 1;
     o.series = series;
     o.record = record;
     o.id = id;
+    lines = false;
     o.draw = function()
-    {
-        settings.ctx.fillStyle = settings.dotFill;
-        
-        if (id == settings.touchedObject)
-        {                        
-            settings.ctx.globalAlpha=g.settings.highlightedOpacity;
-        }
-        else
-        {            
-            settings.ctx.globalAlpha=g.settings.defaultOpacity;
-        }
+    {        
+        clog("drawing!")
+        settings.ctx.fillStyle = settings.bgCol;
+        settings.ctx.beginPath();
+        settings.ctx.arc(p.x, p.y, settings.lineWidth * 3, 0, 2 * Math.PI, false);        
         
         if (id == settings.touchedObject)
         {
-            clog("touching this dot");
-         //   settings.ctx.fillStyle = '#F00';
+            settings.ctx.fillStyle = settings.colours[series] ;
+            
+            //settings.ctx.fillStyle = '#000';
+        }
+        else
+        {
+            settings.ctx.fillStyle = '#FFF';
+            
         }
         
         
         
-        settings.ctx.beginPath();
-        settings.ctx.arc(p.x, p.y, settings.lineWidth * 1.5, 0, 2 * Math.PI, false);        
-        settings.ctx.fill();
+        settings.ctx.fill();        
         settings.ctx.lineWidth = settings.lineWidth;
-        settings.ctx.strokeStyle = settings.dotFill;
-        settings.ctx.stroke();
+        settings.ctx.strokeStyle = settings.colours[series] ;
+        clog("applying colour " + settings.colours[series] + " with lineWidth of " + settings.lineWidth)
+        settings.ctx.stroke();        
         
-        settings.ctx.fillStyle = settings.dotFill;
+        settings.ctx.fillStyle = settings.bgCol;
+        settings.ctx.globalAlpha=1;
+       
+        
+        
     };
     
     
@@ -1267,6 +1376,7 @@ function dotObject(settings, i, p, id, series, record)
     
     o.touching = function(y,x)
     {
+        
         var y1 = p.y;
         var x1 = p.x;
         
@@ -1333,6 +1443,7 @@ function objectsCollection()
     
     o.drawAll = function()
     {
+        o.maxOrder = 1;
         for (var d = 0; d <= o.maxOrder; d++)
         {
             for (var i = 0; i < o.count; i++)

@@ -52,15 +52,12 @@
       </div>
     </header>
 
-    <div id="content-wrapper">
+    
+    <div id="content-wrapper" >
       <div class="inner clearfix">
         <section id="main-content">
-
-
-          <!--------------------- Main--------------------->          
-          
-          <p>
-            
+          <!--------------------- Main--------------------->                    
+          <p>            
             <table id="topIcons">
               <tr>
                 <td width=33% valign=center>
@@ -76,7 +73,7 @@
               <tr>
                 <td valign=top>Visualise your data with beatiful HTML5 animations</td>
                 <td valign=top>Countless configurations through the JavaScript interface</td>
-                <td valign=top>Set up takes less than 2 minutes</td>
+                <td valign=top>Setup takes less than 2 minutes</td>
               </tr>
             </table>
             <br>
@@ -127,9 +124,9 @@
         The current version of J-Charts is still pre-release while we polish some edges, but it should already work perfectly well in your organisation.        
         This release includes:<br>
         <ul>
-          <li>Bar & Stack Charts</li>
+          <li>Bar & Scatter Charts</li>
             <ul>
-              <li>Including multiple series</li>
+              <li>Including multiple series & stacking options</li>
             </ul>
             <li>Pie, Donut & Polar Charts</li>
             <ul>
@@ -164,7 +161,7 @@
                 <td>Alice</td>
                 <td><center>$40.00</center></td>
                 <td><center>$20.00</center></td>
-                <td><center>$40.00</center></td>
+                <td><center>$45.00</center></td>
             </tr>
             <tr>
                 <td>Bob</td>
@@ -192,7 +189,7 @@
                 <b>Chart Type</b><br>
                 <input type="radio" name="chartType" value="DEFAULT" checked=true>Default<br>
                 <input type="radio" name="chartType" value="bar">Bar<br>
-                <input type="radio" name="chartType" value="stackedBar">Stacked Bar<br>
+                <input type="radio" name="chartType" value="scatter">Scatter<br>
                 <input type="radio" name="chartType" value="pie">Pie<br>
                 <input type="radio" name="chartType" value="donut">Donut<br>
                 <input type="radio" name="chartType" value="polar">Polar<br>            
@@ -216,8 +213,14 @@
                 <b>Animation Time</b><br>
                 <input type="range" id="animationTimeRange" min="0" max="10" value="7">
             </td>
-            <td class="controlTD" valign=middle align=center> </td>
-            <td></td>
+            <td class="controlTD" valign=middle>
+              <b>Inverse the data</b><br>
+              <input type="checkbox" id="inverseData" /> Inversed<br>
+            </td>
+            <td class="controlTD" valign=middle>
+              <b>Stack values (for bar/scatter)</b><br>
+              <input type="checkbox" id="stackValues" /> Stacked<br>
+            </td>
           </tr>                  
         </table>
         <center><button onclick="writeCode()">Draw</button></center>
@@ -248,6 +251,13 @@
 
         <!-- Side Bar-->
         <aside id="sidebar">
+          <a href="#demo" class="button2">
+            <small>Try it first!</small>
+            Live Demo
+          </a>
+          <br>
+          Ready to install?
+          <br><br>
           <a href="https://github.com/dburrell/jCharts/zipball/master" class="button">
             <small>Download</small>
             .zip file
@@ -256,6 +266,7 @@
             <small>Download</small>
             .tar.gz file
           </a>
+          
           <p class="repo-owner"><a href="https://github.com/dburrell/jCharts"  target="new" >J-Charts</a> is maintained by <a href="https://github.com/dburrell"  target="new" >dburrell</a>.</p><br>          
           <p class="creditDue">This page is originally designed from the <a href="https://pages.github.com"  target="new" >GitHub Pages</a> Architect theme by <a href="https://twitter.com/jasonlong"  target="new" >Jason Long</a>.</p>
         </aside>

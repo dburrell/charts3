@@ -11,20 +11,51 @@ function writeCode()
     ////////////////////////////////////////////////////////////////
     //Create the new chart object
     ////////////////////////////////////////////////////////////////
-    code += "var g = $('#dataTable').jChart(); // Generate from data, can override defaults" + "<br>";
+    
     if (g != null)
     {
         g.destroy();    
     }        
-    g = $('#dataTable').jChart();
+    
+    
+    
+    var inverseData = $("#inverseData")[0].checked;
+    
+    if (inverseData != true)
+    {                
+        code += "var g = $('#dataTable').jChart(); // Generate from data, can override defaults" + "<br>";        
+        g = $('#dataTable').jChart({inverseData: false});
+    }
+    else
+    {
+        code += "var g = $('#dataTable').jChart({inverseData: true}); // Generate from data, can override defaults" + "<br>";        
+        g = $('#dataTable').jChart({inverseData: true});
+    }
     
     
     ////////////////////////////////////////////////////////////////
     //Set position
     ////////////////////////////////////////////////////////////////
-    code += "g.setContainer('container');   // Set parent object (optional)" + "<br>";        
-    
+    code += "g.setContainer('container');   // Set parent object (optional)" + "<br>";            
     g.setContainer('container');
+    
+    
+    
+    ////////////////////////////////////////////////////////////////
+    //Stack Data
+    ////////////////////////////////////////////////////////////////
+    var stacked = $("#stackValues")[0].checked;
+    if (stacked)
+    {
+        code += "g.setStackedValues(true);   // Stack values (for bar/scatter)" + "<br>";            
+        g.setStackedValues(true);    
+    }
+    else
+    {
+        code += "g.setStackedValues(false);   // Don't stack values" + "<br>";            
+        g.setStackedValues(false);    
+    }
+    
     
     
     
@@ -86,7 +117,7 @@ function writeCode()
         code += "// Don't set a theme, set details manually" + "<br>"
         code += "g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f']; " + "<br>";
         code += "g.settings.lineColor = #777;" + "<br>";
-        code += "g.settings.lineWidth = 0;" + "<br>";
+        code += "g.settings.lineWidth = 1;" + "<br>";
         code += "g.settings.defaultOpacity = 1;" + "<br>";
         code += "g.settings.highlightedOpacity = 0.4;" + "<br>";
         code += "g.settings.fontColour = '#111';" + "<br>";
@@ -96,7 +127,7 @@ function writeCode()
         g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f'];
         
         g.settings.lineColor = '#777';
-        g.settings.lineWidth = 0;
+        g.settings.lineWidth = 1;
 
         g.settings.defaultOpacity = 1;
         g.settings.highlightedOpacity = 0.4;
@@ -121,11 +152,27 @@ function writeCode()
         debug(1,"Not going to recurse debug here, for that increase env.debugLevel to 3");
     }
     
+   
+   
+   
+   
+    //CHANGEME
+   if (false)
+   {    
+    $( g.id).appendTo('body');
+    $( g.id).css('position','absolute');
+    $( g.id).css('top','200px');
+    $( g.id).css('left','40%');
+   }
+   
+    
     g.draw();
+    
     if (env.debugLevel < 3)
     {
         outFunction("graph DRAW");
     }
+   
     //code += "//Draw the chart" + "<br>"
     code += "g.draw();  // Draw the chart";
     
