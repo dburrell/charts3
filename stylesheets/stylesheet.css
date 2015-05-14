@@ -845,6 +845,12 @@ dl dd {
   aside#sidebar a.button {
     display: none;
   }
+  aside#sidebar a.button2 {
+    display: none;
+  }
+  aside#sidebar .ready {
+    display: none;
+  }
   #main-content h1:before,
   #main-content h2:before,
   #main-content h3:before,
