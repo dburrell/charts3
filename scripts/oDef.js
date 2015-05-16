@@ -53,8 +53,7 @@ function graph(type)
         
         $( "#canvas" + o.settings.randomNumber).mouseleave(function( event )
         {            
-            o.mouseExit();
-            
+            //o.mouseExit();            
         });
         outFunction("o.init()");
     };
@@ -857,15 +856,16 @@ function graph(type)
         var trueY = y + obj.offset().top;
         var trueX = x + obj.offset().left;
         
+        
         var currentlyTouching = o.settings.touchedObject;        
         var touchingSomething = -1;
         
         for (var i = 0; i < o.objects.count; i++)
         {
-            var obj = o.objects.objects[i];
-            if (obj.touching(y,x))
+            var shape = o.objects.objects[i];
+            if (shape.touching(y,x))
             {
-                touchingSomething = obj.id;                
+                touchingSomething = shape.id;                
             }            
         }
         
@@ -881,13 +881,23 @@ function graph(type)
                 o.settings.touchedObject = -1;
                 if (enableTooltips)
                 {
-                    $('#tooltip' + o.settings.randomNumber).remove();
+                    $('.tooltip' + o.settings.randomNumber).remove();
                 }
             }
             else
             {
                 o.settings.touchedObject = touchingSomething;
                         
+                
+                var shape = o.objects.objects[touchingSomething];
+                //Alter display point if the object requires it
+                if (shape.staticTooltips)
+                {
+                    trueX = shape.tipX + obj.offset().left;
+                    trueY = shape.tipY + obj.offset().top;
+                    //+ obj.offset().top;
+                }
+                
                 var series = o.objects.objects[touchingSomething].series;
                 var record = o.objects.objects[touchingSomething].record;
                      
@@ -898,6 +908,12 @@ function graph(type)
                     switch (o.settings.tooltipContents)
                     {
                         case toolTipContentTypes.record:
+                            contents = "" + o.records[record] + ": " + o.values.get(series,record)+ "<br>";
+                            break;
+                        case toolTipContentTypes.series:
+                            contents = "" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
+                            break;
+                        case toolTipContentTypes.recordSeries:
                             contents = "" + o.records[record] + "/" + o.series[series] + ": " + o.values.get(series,record)+ "<br>";
                             break;
                         case toolTipContentTypes.fullRecord:
@@ -1075,8 +1091,10 @@ function array2d()
  var toolTipContentTypes = $.extend(
  {
      record: 1,
-     fullRecord: 2,
-     fullSeries: 3     
+     series: 2,
+     recordSeries: 3,
+     fullRecord: 4,
+     fullSeries: 5     
  });
 
 //Types line options
@@ -1099,6 +1117,9 @@ function barObject(settings, i, p1, p2, id, series, record, stacked)
     o.p1 = p1;
     o.p2 = p2;
     o.drawOrder = 0;
+    o.staticTooltips = true;
+    o.tipY = p2.y ;
+    o.tipX = p1.x + (p2.x - p1.x)/2;
     o.series = series;
     o.record = record;
     o.type = types.bar;
@@ -1122,11 +1143,11 @@ function barObject(settings, i, p1, p2, id, series, record, stacked)
         
         if (id == settings.touchedObject)
         {                        
-            settings.ctx.globalAlpha=g.settings.highlightedOpacity;
+            settings.ctx.globalAlpha=settings.highlightedOpacity;
         }
         else
         {            
-            settings.ctx.globalAlpha=g.settings.defaultOpacity;
+            settings.ctx.globalAlpha=settings.defaultOpacity;
         }
         
         
@@ -1184,6 +1205,7 @@ function pieSliceObject(g, i, sAngle, eAngle, id, val, donut, polar, series, rec
     o.centreX = 0;
     o.centreY = 0;
     o.touched = false;
+    o.staticTooltips = false;
     o.series = series;
     o.record = record;
     o.type = types.pie;
@@ -1333,9 +1355,11 @@ function dotObject(settings, i, oldPoint, p, id, series, record)
     var o = {};
     o.p1 = p;
     o.drawOrder = 1;
+    o.staticTooltips = true;
     o.series = series;
     o.record = record;
     o.id = id;
+    
     lines = false;
     o.draw = function()
     {        

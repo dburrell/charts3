@@ -61,7 +61,7 @@
             touchedObject: -1,
             
             //Tooltip settings
-            tooltipContents:toolTipContentTypes.fullRecord,
+            tooltipContents:toolTipContentTypes.series,
             tooltipPercentages: true,
             
             //Colouring

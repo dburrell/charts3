@@ -14,39 +14,98 @@ var debugFunctionCount = 0;
 //tooltip
 function tooltip(id, classes, y, x, contents)
 {
-    //remove existing one
-    $("." + classes).remove();
-
-    //Create div
-    var style = "";
-    style += "position:absolute;" // position absolute (moves)
-    style += "top:" + y + "px;" // top position
-    style += "left:" + x + "px;" // left position
-
-    style += "background:rgba(200,200,200,0.8);" // background color
-    style += "color:#000;" // font color
-    style += "border:1px solid #000;" // background color
-
-    style += "padding:5px;" // padding around the text
-
-    style += "margin-top:15px;" // keep it just below the mouse
-    style += "margin-left:15px;" // keep it to right of mouse
-
-    style += "border-radius:5px;" // rounded corners
-
-    style += "font-family:courier;" // monospaced font
-    style += "font-size:12px;" // small writing
-
-    var $newdiv1 = $("<div id='" + id + "' class='" + classes + "' style='" + style + "'>" + contents + "</div>");
-
-    //Append newly created
-    $("body").append($newdiv1);
-
-    //Mouse over the div will remove it
-    $("." + classes).mouseenter(function()
+    var includeDownArrow = true;
+    var bgCol = "rgba(100,100,100,0.9)";
+    var fCol = "#FFF";
+    if (id != 0)
     {
-        $("." + classes).remove();
-    });
+            
+        
+        //clog("about to start with classes of " + classes + " from id " + id)
+        var existing = $("." + classes);
+     
+        var redraw = false;
+        if (existing == null || existing == [])
+        {            
+            //clog("no existing so redraw = true");
+            redraw = true;
+        }
+        else
+        {         
+            if (parseInt(existing.css("top")) != parseInt(y) || parseInt(existing.css("left")) != parseInt(x))
+            {                
+                redraw = true
+            }
+        }
+        
+        if (redraw)    
+        {
+            clog("redrawing with classes " + classes);
+            //remove existing one
+            $("." + classes).remove();
+        
+            //Create div
+            var style = "";
+            style += "position:absolute;" // position absolute (moves)
+            style += "top:" + y + "px;" // top position
+            style += "left:" + x + "px;" // left position
+        
+            style += "background:" + bgCol + ";" // background color
+            style += "color:" + fCol + ";" // font color
+            //style += "border:1px solid #000;" // background color
+        
+            style += "padding:5px;" // padding around the text
+        
+            style += "border-radius:5px;" // rounded corners
+        
+            style += "font-family: sans-serif;" // monospaced font
+            style += "font-size:10px;" // small writing
+            style += "text-align:center;" // centered text
+        
+            var newdiv1 = $("<div id='" + id + "' class='" + classes + "' style='" + style + "'>" + contents + "</div>");
+        
+            //Append newly created
+            $("body").append(newdiv1);
+            
+            var offY = 10;
+            var offX = 5;
+            
+            var tip = $("#"+id);
+            var height = $(tip).css('height').replace('px','');            
+            var width = $(tip).css("width").replace("px",'');
+            
+            $(tip).css("margin-top",(0-(height*2)) - offY)
+            $(tip).css("margin-left",(0-(width/2)) - offX)
+            
+            if (includeDownArrow)
+            {                
+                var style = "";
+                style += "position: absolute; ";
+                 style += "top:" + y + "px;" // top position
+                style += "left:" + x + "px;" // left position
+                style += "margin-top: -11px; ";
+                style += "margin-left: -6px; ";
+                style += "width: 0; ";
+                style += "height: 0; ";
+                style += "border-left: 10px solid transparent;";
+                style += "border-right: 10px solid transparent;";
+        
+                style += "border-top: 10px solid " + bgCol + ";";
+                var arrow = $("<div id='" + id + "Arrow' class='" + classes + "' style='" + style + "'>" + "" + "</div>");
+                $("body").append(arrow);
+            }
+            else
+            {
+                clog("not drawing arrow");
+            }
+            
+             
+        }
+        else
+        {
+            //redraw is false!
+        }
+    }
 }
 
 
