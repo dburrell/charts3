@@ -39,8 +39,7 @@ function tooltip(id, classes, y, x, contents)
         }
         
         if (redraw)    
-        {
-            clog("redrawing with classes " + classes);
+        {            
             //remove existing one
             $("." + classes).remove();
         
@@ -77,8 +76,6 @@ function tooltip(id, classes, y, x, contents)
             
             $(tip).css("margin-top",    (0 - (height * 2)) - offY);
             $(tip).css("margin-left",   (0 - (width  / 2)) - offX);
-            
-            clog("height is " + height);
             
             if (includeDownArrow)
             {                

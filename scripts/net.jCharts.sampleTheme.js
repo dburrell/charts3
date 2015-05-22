@@ -25,8 +25,12 @@
     theme.lineWidth = 2;
     
     //Opacities
-    theme.defaultOpacity = 1;
+    theme.defaultOpacity = 0.7;
     theme.highlightedOpacity = 0.4;
+    
+    //Grid
+    theme.gridWeight = 1;
+    theme.gridColour = '#DDD';
     
     //Font
     theme.fontColour = '#888';

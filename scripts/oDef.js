@@ -46,8 +46,8 @@ function graph(type)
         //On mouse over of this canvas, 
         $( "#canvas" + o.settings.randomNumber).mousemove(function( event )
         {            
-            var y = event.pageY;
-            var x = event.pageX;
+            var y = event.pageY - 3;
+            var x = event.pageX - 3;
             o.mouseOver(y,x);                
         });
         
@@ -317,7 +317,7 @@ function graph(type)
         {                        
             $(this).find('td').each(function(x)
             {
-                //findme
+                
                 var val = $(this).text();
                 data.set(x,y,val);
                 x++;
@@ -456,22 +456,24 @@ function graph(type)
             //Add borders and axis settings etc
             if (o.settings.seriesTypes[0] == types.bar                
                 || o.settings.seriesTypes[0] == types.line
-                || o.settings.seriesTypes[0] == types.scatter)
+                || o.settings.seriesTypes[0] == types.scatter
+                || o.settings.seriesTypes[0] == types.polar)
             {
                 //Assumption is that we won't have combined incompatible types (a bar and a pie etc) so if first requires chartArea then go for it
             
-                
-                //Add the borders 
-                drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.height - o.settings.margin, o.settings.width - o.settings.margin));    // x
-                drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.margin, o.settings.margin));                                           // y
-    
-                //Add the x axis values (record values)
-                for (var i = 0; i < o.recordCount; i++)
+                if (o.settings.seriesTypes[0] != types.polar)
                 {
-                    var x = (barWidth / 2) + (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1)));
-                    canvasWrite(ctx, o.records[i], o.settings.height - o.settings.margin + 12, x, o.settings.fontSize, o.settings.font, o.settings.fontColour, hAlign.centre)
+                    //Add the borders 
+                    drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.height - o.settings.margin, o.settings.width - o.settings.margin));    // x
+                    drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.margin, o.settings.margin));                                           // y
+        
+                    //Add the x axis values (record values)                                        
+                    for (var i = 0; i < o.recordCount; i++)
+                    {
+                        var x = (barWidth / 2) + (o.settings.margin + (barWidth * i) + (o.settings.gap * (i + 1)));
+                        canvasWrite(ctx, o.records[i], o.settings.height - o.settings.margin + 12, x, o.settings.fontSize, o.settings.font, o.settings.fontColour, hAlign.centre)
+                    }
                 }
-            
                 
             
                 
@@ -511,35 +513,70 @@ function graph(type)
                 
                 //Find pixels per value (i.e. ratio)
                 var valRatio = (o.settings.height - (2 * o.settings.margin)) / maxVal;
-    
-                
-    
-                //Add the y axis values (just the bar and numbers)
                 var yVals = (maxVal - minVal) / o.settings.yScale;
-                for (var i = minVal; i <= yVals; i++)
-                {
-                    var val = minVal + (o.settings.yScale * i);
-                    var y = (((o.settings.height - o.settings.margin) - (o.settings.height - o.settings.margin * 2) / yVals * i) + o.settings.fontSize / 2) - 3;
-                    canvasWrite(ctx, val, y, o.settings.margin - 3, o.settings.fontSize - 1, o.settings.font, o.settings.fontColour,hAlign.right)
-
-                    //Grid
-                    if (o.settings.gridWeight > 0 && i > 0)
+                
+                //Add gridlines & numbers
+                if (o.settings.seriesTypes[0] == types.polar)
+                {                    
+                     
+                    for (var i = minVal; i <= yVals; i++)
                     {
-                        y = parseInt(y) - 3;
-                        var x1 = o.settings.margin + 1;
-                        var x2 = o.settings.width - o.settings.margin;
+                        var val = minVal + (o.settings.yScale * i);
+                        var x1 = o.settings.width/2;                  // Centre X
+                        var y1 = o.settings.height/2;                 // Centre Y
                         
-                        var p1 = point(y,x1);
-                        var p2 = point(y,x2);
+                        var radius = o.settings.width/4;
+                        radius = radius/yVals * i;
                         
-                        drawLine(ctx,o.settings.gridColour,o.settings.gridWeight,p1,p2);
+                        //findme
+                        o.settings.ctx.strokeStyle = o.settings.gridColour;
+                        o.settings.ctx.lineWidth = o.settings.gridWeight;
                         
-                        //drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.margin, o.settings.margin));
+                        o.settings.ctx.beginPath();
+                        o.settings.ctx.arc(x1, y1, radius, d2r(0), d2r(360));
+                        
+                        o.settings.ctx.stroke();
+                        
+                        var val = minVal + (o.settings.yScale * i);
+                        //var y = (((o.settings.height - o.settings.margin) - (o.settings.height - o.settings.margin * 2) / yVals * i) + o.settings.fontSize / 2) - 3;
+                        //y = y/2
+                        y = y1 -  ((o.settings.width/4)/yVals * i)
+                        
+                        canvasWrite(ctx, val, y, x1, o.settings.fontSize - 1, o.settings.font, o.settings.fontColour,hAlign.centre)
+                    }              
+                }
+                else
+                {
+                    //Add the y axis values (just the bar and numbers)
+                    
+                    for (var i = minVal; i <= yVals; i++)
+                    {
+                        var val = minVal + (o.settings.yScale * i);
+                        var y = (((o.settings.height - o.settings.margin) - (o.settings.height - o.settings.margin * 2) / yVals * i) + o.settings.fontSize / 2) - 3;
+                        canvasWrite(ctx, val, y, o.settings.margin - 3, o.settings.fontSize - 1, o.settings.font, o.settings.fontColour,hAlign.right)
+    
+                        //Grid
+                        if (o.settings.gridWeight > 0 && i > 0)
+                        {
+                            y = parseInt(y) - 3;
+                            var x1 = o.settings.margin + 1;
+                            var x2 = o.settings.width - o.settings.margin;
+                            
+                            var p1 = point(y,x1);
+                            var p2 = point(y,x2);
+                            
+                            drawLine(ctx,o.settings.gridColour,o.settings.gridWeight,p1,p2);
+                            
+                            //drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.margin, o.settings.margin));
+                        }
                     }
                 }
-
             
             }
+            
+           
+            
+            
             o.settings.fadeTime = 0;
             
             var frac = 1;
@@ -1221,9 +1258,13 @@ function pieSliceObject(g, i, sAngle, eAngle, id, val, donut, polar, series, rec
     o.centreX = 0;
     o.centreY = 0;
     o.touched = false;
-    o.staticTooltips = false;
+    o.staticTooltips = true;
     o.series = series;
     o.record = record;
+    o.tipX = 0; //this gets adjusted as it's drawn
+    o.tipY = 0;
+         
+    
     o.type = types.pie;
     if (donut)
     {
@@ -1307,6 +1348,15 @@ function pieSliceObject(g, i, sAngle, eAngle, id, val, donut, polar, series, rec
         
         
         settings.ctx.globalAlpha=1;
+        
+        
+        
+        //Adjust tooltip location
+        var midAngle = sAngle + (eAngle - sAngle)/2;
+        var tipRadius = radius/2;
+        o.tipX = (tipRadius * Math.cos(d2r(midAngle))) + x1;
+        o.tipY = (tipRadius * Math.sin(d2r(midAngle))) + y1;;
+        
     };
     o.touching = function(y,x)
     {
