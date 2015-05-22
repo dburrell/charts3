@@ -18,6 +18,7 @@
     <!--Theme js files-->
     <script src="scripts/net.jCharts.greys.js"></script>
     <script src="scripts/net.jCharts.sampleTheme.js"></script>
+    
   </head>
   
   <body >
@@ -57,10 +58,15 @@
   <script language="javascript">
   
     
-      var g = $("#dataTable").jChart({container:'container'});
-      g.settings.stacked = true;
-      g.setChartType(types.scatter);
-      g.draw();
+      var g = $('#dataTable').jChart();                 // Generate from data, can override defaults
+      g.setContainer('container');                      // Set parent object (optional)
+      g.setStackedValues(true);                         // Stack values (for bar/scatter)
+      g.setChartType(types.scatter);                    // Set the chart type
+      g.setAnimationTime(700);                          // Animation will take 700 ms
+      //g.setToolTipContents(toolTipContentTypes.record); // Set the tooltip content  
+      g.setTheme('net.jCharts.sampleTheme');            // Set the theme from js file.
+      
+      g.draw();                                         // Draw the chart
     
     
   </script>

@@ -61,6 +61,7 @@ function tooltip(id, classes, y, x, contents)
             style += "font-family: sans-serif;" // monospaced font
             style += "font-size:10px;" // small writing
             style += "text-align:center;" // centered text
+            style += "line-height:1;" // centered text
         
             var newdiv1 = $("<div id='" + id + "' class='" + classes + "' style='" + style + "'>" + contents + "</div>");
         
@@ -70,12 +71,14 @@ function tooltip(id, classes, y, x, contents)
             var offY = 10;
             var offX = 5;
             
-            var tip = $("#"+id);
+            var tip = $("#" + id);
             var height = $(tip).css('height').replace('px','');            
             var width = $(tip).css("width").replace("px",'');
             
-            $(tip).css("margin-top",(0-(height*2)) - offY)
-            $(tip).css("margin-left",(0-(width/2)) - offX)
+            $(tip).css("margin-top",    (0 - (height * 2)) - offY);
+            $(tip).css("margin-left",   (0 - (width  / 2)) - offX);
+            
+            clog("height is " + height);
             
             if (includeDownArrow)
             {                
@@ -97,9 +100,7 @@ function tooltip(id, classes, y, x, contents)
             else
             {
                 clog("not drawing arrow");
-            }
-            
-             
+            }            
         }
         else
         {
