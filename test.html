@@ -20,7 +20,7 @@
     <script src="scripts/net.jCharts.sampleTheme.js"></script>
   </head>
   
-  <body onload="bodyLoad()">
+  <body >
     <br>
       <!--Data Table-->
       <table id="dataTable">
@@ -56,11 +56,12 @@
   
   <script language="javascript">
   
-    function bodyLoad()
-    {
+    
       var g = $("#dataTable").jChart({container:'container'});
+      g.settings.stacked = true;
+      g.setChartType(types.scatter);
       g.draw();
-    }
+    
     
   </script>
   

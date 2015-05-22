@@ -1359,7 +1359,8 @@ function dotObject(settings, i, oldPoint, p, id, series, record)
     o.series = series;
     o.record = record;
     o.id = id;
-    
+    o.tipY = p.y - 6 ;
+    o.tipX = p.x - 4;
     lines = false;
     o.draw = function()
     {        

@@ -81,7 +81,7 @@ function tooltip(id, classes, y, x, contents)
             {                
                 var style = "";
                 style += "position: absolute; ";
-                 style += "top:" + y + "px;" // top position
+                style += "top:" + y + "px;" // top position
                 style += "left:" + x + "px;" // left position
                 style += "margin-top: -11px; ";
                 style += "margin-left: -6px; ";
