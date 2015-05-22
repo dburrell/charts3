@@ -20,6 +20,10 @@
             cols: -1,                                               // Number of columns per series            
             position: 'absolute',                                   // CSS Positioning of the canvas
             
+            //Grid
+            gridWeight: 1,
+            gridColour: '#EEE',
+            
             //Data handling
             stacked:true,                                           //Stack values?            
             inverseData: false,

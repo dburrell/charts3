@@ -117,7 +117,7 @@ function writeCode()
         code += "// Don't set a theme, set details manually" + "<br>"
         code += "g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f']; " + "<br>";
         code += "g.settings.lineColor = #777;" + "<br>";
-        code += "g.settings.lineWidth = 1;" + "<br>";
+        code += "g.settings.lineWidth = 2;" + "<br>";
         code += "g.settings.defaultOpacity = 1;" + "<br>";
         code += "g.settings.highlightedOpacity = 0.4;" + "<br>";
         code += "g.settings.fontColour = '#111';" + "<br>";
@@ -127,7 +127,7 @@ function writeCode()
         g.settings.colours = ['#e67e22','#16a085','#34495e','#e74c3c','#95a5a6','#1abc9c','#f1c40f'];
         
         g.settings.lineColor = '#777';
-        g.settings.lineWidth = 1;
+        g.settings.lineWidth = 2;
 
         g.settings.defaultOpacity = 1;
         g.settings.highlightedOpacity = 0.4;

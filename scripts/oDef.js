@@ -462,8 +462,8 @@ function graph(type)
             
                 
                 //Add the borders 
-                drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.height - o.settings.margin, o.settings.width - o.settings.margin));
-                drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.margin, o.settings.margin));
+                drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.height - o.settings.margin, o.settings.width - o.settings.margin));    // x
+                drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.margin, o.settings.margin));                                           // y
     
                 //Add the x axis values (record values)
                 for (var i = 0; i < o.recordCount; i++)
@@ -472,6 +472,7 @@ function graph(type)
                     canvasWrite(ctx, o.records[i], o.settings.height - o.settings.margin + 12, x, o.settings.fontSize, o.settings.font, o.settings.fontColour, hAlign.centre)
                 }
             
+                
             
                 
                 
@@ -518,8 +519,23 @@ function graph(type)
                 for (var i = minVal; i <= yVals; i++)
                 {
                     var val = minVal + (o.settings.yScale * i);
-                    var y = ((o.settings.height - o.settings.margin) - (o.settings.height - o.settings.margin * 2) / yVals * i) + o.settings.fontSize / 2;
+                    var y = (((o.settings.height - o.settings.margin) - (o.settings.height - o.settings.margin * 2) / yVals * i) + o.settings.fontSize / 2) - 3;
                     canvasWrite(ctx, val, y, o.settings.margin - 3, o.settings.fontSize - 1, o.settings.font, o.settings.fontColour,hAlign.right)
+
+                    //Grid
+                    if (o.settings.gridWeight > 0 && i > 0)
+                    {
+                        y = parseInt(y) - 3;
+                        var x1 = o.settings.margin + 1;
+                        var x2 = o.settings.width - o.settings.margin;
+                        
+                        var p1 = point(y,x1);
+                        var p2 = point(y,x2);
+                        
+                        drawLine(ctx,o.settings.gridColour,o.settings.gridWeight,p1,p2);
+                        
+                        //drawLine(ctx, o.settings.borderCol, 1, point(o.settings.height - o.settings.margin, o.settings.margin), point(o.settings.margin, o.settings.margin));
+                    }
                 }
 
             
@@ -1363,22 +1379,22 @@ function dotObject(settings, i, oldPoint, p, id, series, record)
     o.tipX = p.x - 4;
     lines = false;
     o.draw = function()
-    {        
-        clog("drawing!")
+    {
+        var first = false;
+        var last = false;
+        
         settings.ctx.fillStyle = settings.bgCol;
         settings.ctx.beginPath();
         settings.ctx.arc(p.x, p.y, settings.lineWidth * 3, 0, 2 * Math.PI, false);        
         
         if (id == settings.touchedObject)
-        {
-            settings.ctx.fillStyle = settings.colours[series] ;
-            
+        {            
+            settings.ctx.fillStyle = settings.colours[series] ;        
             //settings.ctx.fillStyle = '#000';
         }
         else
         {
             settings.ctx.fillStyle = '#FFF';
-            
         }
         
         
@@ -1386,7 +1402,7 @@ function dotObject(settings, i, oldPoint, p, id, series, record)
         settings.ctx.fill();        
         settings.ctx.lineWidth = settings.lineWidth;
         settings.ctx.strokeStyle = settings.colours[series] ;
-        clog("applying colour " + settings.colours[series] + " with lineWidth of " + settings.lineWidth)
+        //clog("applying colour " + settings.colours[series] + " with lineWidth of " + settings.lineWidth)
         settings.ctx.stroke();        
         
         settings.ctx.fillStyle = settings.bgCol;

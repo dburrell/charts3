@@ -22,7 +22,7 @@
     theme.bgCol = 'transparent';
     
     //For scatter type
-    theme.lineWidth = 1;
+    theme.lineWidth = 2;
     
     //Opacities
     theme.defaultOpacity = 1;
