@@ -1,5 +1,7 @@
 # jCharts v3
 
+
+
 Version 3 of jCharts is a complete rewrite from the ground up, with a focus on data flexibility. Key features include:
 
   - jQuery plugin format
@@ -8,6 +10,7 @@ Version 3 of jCharts is a complete rewrite from the ground up, with a focus on d
 
 jCharts is a pure javascript implementation of a variety of animated charts and graphs. 
 
+![alt tag](https://raw.githubusercontent.com/dburrell/jCharts/master/images/charts.png)
 
 ### Current Status
 In Development - no stable releases
